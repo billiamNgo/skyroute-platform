@@ -85,6 +85,12 @@ psd
 thumb
 sketch
 
+## Prisma ##
+# Keep environment variables out of version control
+apps/server/.env
+apps/server/src/generated/prisma
+
+
 ### Windows ###
 # Windows thumbnail cache files
 Thumbs.db
