@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 export default function Register() {
   const navigate = useNavigate();
 
+  const ADMIN_CODE = "SKYROUTE" // for temporary front-end validation
+
   const roles = [
     { value: "technician", label: "Technician" },
     { value: "pharmacist", label: "Pharmacist" },
@@ -22,14 +24,23 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
+
+    if(!username.trim()) return setMessage("Username is required.");
+    if(!password.trim()) return setMessage("Password is required.");
+    if(!role) return setMessage("Please select a role.");
+    if (role === "admin" && adminCode !== ADMIN_CODE) {
+      return setMessage("Invalid admin code.");
+    }
+
     setLoading(true);
-
     await new Promise((r) => setTimeout(r, 400));
-
     setLoading(false);
-    setMessage("Registration submitted. Redirecting...");
 
-    setTimeout(() => navigate("/"), 700);
+    localStorage.setItem("role", role);
+    localStorage.setItem("username", username);
+
+    setMessage("Registration submitted. Redirecting...");
+      setTimeout(() => navigate("/"), 700);
   };
 
   return (

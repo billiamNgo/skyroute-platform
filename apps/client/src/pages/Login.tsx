@@ -14,14 +14,24 @@ export default function Login() {
     const handleSubmit = async (e) => { 
         e.preventDefault();
         setMessage("");
+
+        if (!username.trim()) return setMessage("Username is required.");
+        if (!password.trim()) return setMessage("Password is required.");
+
         setLoading(true);
-
         await new Promise((r) => setTimeout(r, 400));
-
         setLoading(false);
+
+        // for temporary front-end testing
+        const role = localStorage.getItem("role") || "technician";
         setMessage("Login submitted. Redirecting...");
 
-        setTimeout(() => navigate("/dashboard/technician"), 500);
+        setTimeout(() => {
+        if (role === "admin") navigate("/admin");
+        else if (role === "pharmacist") navigate("/pharmacist");
+        else navigate("/technician");
+    }, 300);
+
     };
 
     // Styling for authentication (Login/Register) UI
