@@ -7,7 +7,7 @@ export default function Login() {
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    
+
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
 
@@ -21,10 +21,10 @@ export default function Login() {
         setLoading(false);
         setMessage("Login submitted. Redirecting...");
 
-        setTimeout(() => navigate("/dashboard/technician"), 500);
+        // setTimeout(() => navigate("/dashboard/technician"), 500);
     };
 
-    {/* Styling for authentication (Login/Register) UI */}
+    // Styling for authentication (Login/Register) UI
     return ( 
         <div className="auth-page">
             <div className="auth-card">
@@ -51,7 +51,7 @@ export default function Login() {
                         <div className="auth-label">Password</div>
                         <input
                             className="auth-input"
-                            type="text"
+                            type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter password"
@@ -59,7 +59,7 @@ export default function Login() {
                     </div>
 
                     {/* Success message */}
-                    {message && <div className="auth-success">(message)</div>}
+                    {message && <div className="auth-success">{message}</div>}
 
                     {/* Submit button */}
                     <button className="auth-button" type="submit" disabled={loading}>
