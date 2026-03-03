@@ -29,7 +29,7 @@ export default function Register() {
     setLoading(false);
     setMessage("Registration submitted. Redirecting...");
 
-    // setTimeout(() => navigate("/"), 700);
+    setTimeout(() => navigate("/"), 700);
   };
 
   return (

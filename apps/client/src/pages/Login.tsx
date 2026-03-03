@@ -21,7 +21,7 @@ export default function Login() {
         setLoading(false);
         setMessage("Login submitted. Redirecting...");
 
-        // setTimeout(() => navigate("/dashboard/technician"), 500);
+        setTimeout(() => navigate("/dashboard/technician"), 500);
     };
 
     // Styling for authentication (Login/Register) UI
