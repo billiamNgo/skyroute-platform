@@ -2,12 +2,21 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
+import TechnicianDashboard from "./pages/TechnicianDashboard";
+import PharmacistDashboard from "./pages/PharmacistDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        <Route path="/technician" element={<TechnicianDashboard />} />
+        <Route path="/pharmacist" element={<PharmacistDashboard />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

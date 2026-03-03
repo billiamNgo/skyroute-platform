@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../styles/auth.css";
+// import "../styles/auth.css";
 
 export default function Login() {
     const navigate = useNavigate(); 
