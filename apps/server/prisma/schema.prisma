@@ -1,13 +1,87 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-generator client {
-  provider = "prisma-client-js"
-}
-
+//.env file should allow this to function as normal, but we need to verify
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
+
+//I am unsure if client will be properly created
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+model User {
+    userID     Int    @id @default(autoincrement())
+    email      String @unique
+    firstName  String
+    lastName   String
+    password   String
+    role       String
+
+}
+
+model Pharmacies {
+    pharmacyID     Int     @id @default(autoincrement())
+    name           String
+    address        String
+    city           String
+    state          String
+    zip            Int
+    apiKeys        APIKeys[]
+    drones         Drones[]
+    orders         Orders[]
+}
+
+model APIKeys {
+    keyID          Int            @id @default(autoincrement())
+    keyHash        String         @unique
+    pharmacyID     Int
+    pharmacy       Pharmacies     @relation(fields: [pharmacyID], references: [pharmacyID])
+    creationDate   DateTime       @default(now())
+    expirationDate DateTime       @default(dbgenerated("NOW() + interval '1 year'"))
+}
+
+model Drones {
+    droneID        Int         @id @default(autoincrement())
+    pharmacyID     Int
+    pharmacy       Pharmacies  @relation(fields: [pharmacyID], references: [pharmacyID])
+    currentStatus  String      @default("IDLE")
+    batteryLevel   Int
+    orders         Orders[]
+    locations      DroneLocation[]
+}
+
+model Orders {
+    orderID            Int         @id @default(autoincrement())
+    pharmacyID         Int
+    pharmacy           Pharmacies  @relation(fields: [pharmacyID], references: [pharmacyID])
+    droneID            Int?
+    drone              Drones?     @relation(fields: [droneID], references: [droneID])
+    customerFirstName  String
+    customerLastName   String
+    address            String
+    city               String
+    state              String
+    zip                Int
+    status             String      @default("PENDING")
+    medicationName     String
+}
+
+model DroneLocation {
+    locationID   Int       @id @default(autoincrement())
+    droneID      Int
+    drone        Drones    @relation(fields: [droneID], references: [droneID], onDelete: Cascade)
+    latitude     Float
+    longitude    Float
+    reportedAt   DateTime  @default(now())
+}
+
+model Commands {}
+
+model UserActions {}
+
+model DroneTele {}
+
+//add table for logging user actions, timestamp (Pino)
+//table for all drone actions
+//table for all valid drone actions
