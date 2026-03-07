@@ -18,3 +18,20 @@ services:
       - server
     environment:
       - VITE_API_URL=http://localhost:8080
+
+  db:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: SkyRouteAdmin
+      POSTGRES_PASSWORD: SkyR0uteP@55w0rd
+      POSTGRES_DB: SkyRoute
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8081:8080

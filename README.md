@@ -22,6 +22,12 @@ sudo docker-compose down
 sudo docker-compose up --build
 ```
 
+If you want to add to the prisma schema run the following commands:
+```
+npx prisma migrate dev --name init
+npx prisma generate
+```
+
 ## Tests
 
 To test the server-side code, run this command:
@@ -31,9 +37,10 @@ To test the server-side code, run this command:
 This will run the code using the testing environment.
 
 ## Environment file
+Create a .env file in the ./apps/server directory
 
 ```
-#.env file content here
+DATABASE_URL="postgresql://SkyRouteAdmin:SkyR0uteP@55w0rd@localhost:5432/SkyRoute"
 ```
 
 
