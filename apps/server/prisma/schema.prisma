@@ -1,13 +1,16 @@
-//.env file should allow this to function as normal, but we need to verify
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-//I am unsure if client will be properly created
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
 }
 
 model User {
@@ -76,11 +79,11 @@ model DroneLocation {
     reportedAt   DateTime  @default(now())
 }
 
-model Commands {}
+// model Commands {}
 
-model UserActions {}
+// model UserActions {}
 
-model DroneTele {}
+// model DroneTele {}
 
 //add table for logging user actions, timestamp (Pino)
 //table for all drone actions
