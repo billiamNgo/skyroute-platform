@@ -33,7 +33,7 @@ This will run the code using the testing environment.
 ## Environment file
 
 ```
-#.env file content here
+DATABASE_URL="postgresql://SkyRouteAdmin:SkyR0uteP@55w0rd@localhost:5432/SkyRoute"
 ```
 
 
