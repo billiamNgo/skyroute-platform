@@ -15,8 +15,7 @@ if (!JWT_SECRET) throw new Error('Missing JWT_SECRET environment variable');
 const tokenService = new TokenService(jwt, JWT_SECRET, JWT_EXPIRES_IN);
 const security = SecurityMiddleware(tokenService);
 
-// app.use(cors({ origin: ['http://localhost:5173', 'http://10.0.5.59:5173'] }));
-app.use(cors({ origin: ['http://10.0.5.59:5173'] }));
+app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 
 app.get('/', (req, res) => {

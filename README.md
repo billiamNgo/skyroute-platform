@@ -41,6 +41,8 @@ Create a .env file in the ./apps/server directory
 
 ```
 DATABASE_URL="postgresql://SkyRouteAdmin:SkyR0uteP@55w0rd@localhost:5432/SkyRoute"
+JWT_SECRET="asdf"
+JWT_EXPIRES_IN="1h"
 ```
 
 
