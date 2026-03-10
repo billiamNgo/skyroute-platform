@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
-import TokenService from './src/routes/token/token.service';
+import TokenService from './src/features/token/token.service';
 import SecurityMiddleware from './src/middleware/security.middleware';
 
 const app = express();

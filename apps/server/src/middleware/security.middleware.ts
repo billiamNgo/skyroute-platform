@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import TokenService from "../routes/token/token.service";
+import TokenService from "../features/token/token.service";
 
 declare module "express" {
   interface Request {
