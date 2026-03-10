@@ -41,10 +41,26 @@ Create a .env file in the ./apps/server directory
 
 ```
 DATABASE_URL="postgresql://SkyRouteAdmin:SkyR0uteP@55w0rd@localhost:5432/SkyRoute"
+JWT_SECRET="asdf"
+JWT_EXPIRES_IN="1h"
 ```
 
 
 ## Database
+
+Ensure that you have prisma installed globally by running
+
 ```
-#database commands here
+npm install -g prisma
 ```
+
+To create the database files, you need to run a migration. You can enter this command after the docker container is already running:
+```
+npx prisma migrate dev --name init
+```
+
+To reset the database:
+```
+npx prisma migrate reset
+```
+This command will reset the database and erase all previous data.
