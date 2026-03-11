@@ -22,8 +22,9 @@ sudo docker-compose down
 sudo docker-compose up --build
 ```
 
-If you want to add to the prisma schema run the following commands:
+If you want to add to the prisma schema run the following commands while the docker container is already running:
 ```
+cd ./apps/server
 npx prisma migrate dev --name init
 npx prisma generate
 ```
@@ -54,8 +55,9 @@ Ensure that you have prisma installed globally by running
 npm install -g prisma
 ```
 
-To create the database files, you need to run a migration. You can enter this command after the docker container is already running:
+To create the database files, you need to run a migration. You must enter these commands while the docker container is running:
 ```
+cd ./apps/server
 npx prisma migrate dev --name init
 ```
 
