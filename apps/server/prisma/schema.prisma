@@ -78,13 +78,3 @@ model DroneLocation {
     longitude    Float
     reportedAt   DateTime  @default(now())
 }
-
-// model Commands {}
-
-// model UserActions {}
-
-// model DroneTele {}
-
-//add table for logging user actions, timestamp (Pino)
-//table for all drone actions
-//table for all valid drone actions
