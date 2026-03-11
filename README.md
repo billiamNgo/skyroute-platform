@@ -32,7 +32,9 @@ npx prisma generate
 
 To test the server-side code, run this command:
 ```
-#testing code here
+cd apps/server
+npx prisma generate
+npm test
 ```
 This will run the code using the testing environment.
 
