@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import "./Register.css"
 
 const API_BASE = "http://localhost:3000";
 
@@ -68,7 +69,7 @@ export default function Register() {
     //localStorage.setItem("role", role);
     //localStorage.setItem("username", username);
 
-      setTimeout(() => navigate("/"), 700);
+      setTimeout(() => navigate("/login"), 700);
     } catch (error: any) { 
       setMessage(error.message || "Something went wrong.");
     } finally { 
