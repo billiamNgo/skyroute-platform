@@ -4,6 +4,7 @@ import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import TokenService from './src/features/token/token.service';
 import SecurityMiddleware from './src/middleware/security.middleware';
+import authRoutes from './src/features/auth/auth.routes';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 8080;
@@ -21,6 +22,8 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('All is well! Connected to the server!');
 });
+
+app.use('/auth', authRoutes);
 
 app.get('/protected', security.authenticateJWT, (req, res) => {
   res.json({ ok: true, user: (req as any).user });
