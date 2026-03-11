@@ -60,6 +60,7 @@ npm install -g prisma
 To create the database files, you need to run a migration. You must enter these commands while the docker container is running:
 ```
 cd ./apps/server
+npx prisma generate
 npx prisma migrate dev --name init
 ```
 
