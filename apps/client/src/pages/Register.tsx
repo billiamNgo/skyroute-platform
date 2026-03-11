@@ -179,7 +179,7 @@ export default function Register() {
 
         {/* Navigation button */}
         <div className="auth-link-row">
-          Already have an account? <Link to="/">Back to Login</Link>
+          Already have an account? <Link to="/login">Back to Login</Link>
         </div>
       </div>
     </div>
