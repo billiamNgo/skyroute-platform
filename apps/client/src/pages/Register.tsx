@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./Register.css"
+import "./Auth.css"
 
 const API_BASE = "http://localhost:3000";
 
@@ -80,6 +80,7 @@ export default function Register() {
   return (
     <div className="auth-page">
       <div className="auth-card">
+        <img src="/drone.png" alt="Sky Route logo" className="auth-logo" />
         <h1 className="auth-title">Sky Route</h1>
         <p className="auth-subtitle">Register</p>
 
