@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-// import "../styles/auth.css";
+import "./Auth.css"
+
+const API_BASE = "http://localhost:3000";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -13,7 +15,9 @@ export default function Register() {
     { value: "admin", label: "Admin" },
   ];
 
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
   const [adminCode, setAdminCode] = useState("");
@@ -21,47 +25,103 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
 
-    if(!username.trim()) return setMessage("Username is required.");
+    if(!email.trim()) return setMessage("Email is required.");
     if(!password.trim()) return setMessage("Password is required.");
+    if(!firstName.trim()) return setMessage("First name is required.");
+    if(!lastName.trim()) return setMessage("Last name is required.");
     if(!role) return setMessage("Please select a role.");
+
     if (role === "admin" && adminCode !== ADMIN_CODE) {
       return setMessage("Invalid admin code.");
     }
+    
+    try {
+      setLoading(true);
+      //await new Promise((r) => setTimeout(r, 400));
+      //setLoading(false);
 
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 400));
-    setLoading(false);
+      const response = await fetch(`${API_BASE}/register`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ 
+          email,
+          firstName,
+          lastName, 
+          password, 
+          role
+        })
+      });
 
-    localStorage.setItem("role", role);
-    localStorage.setItem("username", username);
+      const data = await response.json();
 
-    setMessage("Registration submitted. Redirecting...");
-      setTimeout(() => navigate("/"), 700);
+      if (!response.ok) { 
+        throw new Error(data.message || "Registration failed.");
+      }
+
+      setMessage("Registration successful. Redirecting...");
+
+    //localStorage.setItem("role", role);
+    //localStorage.setItem("username", username);
+
+      setTimeout(() => navigate("/login"), 700);
+    } catch (error: any) { 
+      setMessage(error.message || "Something went wrong.");
+    } finally { 
+      setLoading(false);
+    }
   };
 
   return (
     <div className="auth-page">
       <div className="auth-card">
+        <img src="/drone.png" alt="Sky Route logo" className="auth-logo" />
         <h1 className="auth-title">Sky Route</h1>
         <p className="auth-subtitle">Register</p>
 
         {/* Shared auth UI */}
         <form className="auth-form" onSubmit={handleSubmit}>
-          {/* Username group */}
+
+          {/* Email group */}
           <div>
-            <div className="auth-label">Username</div>
+            <div className="auth-label">Email</div>
+            <input
+              className="auth-input"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter email"
+            />
+          </div>
+
+          {/* First Name group */}
+          <div> 
+            <div className="auth-label">First Name</div>
             <input
               className="auth-input"
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter username"
-            />
-          </div>
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="Enter first name"
+              />
+              </div>
+
+          {/* Last Name group */}
+          <div> 
+            <div className="auth-label">Last Name</div>
+            <input
+              className="auth-input"
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Enter last name"
+              />
+              </div>
 
           {/* Password group */}
           <div>
@@ -121,7 +181,7 @@ export default function Register() {
 
         {/* Navigation button */}
         <div className="auth-link-row">
-          Already have an account? <Link to="/">Back to Login</Link>
+          Already have an account? <Link to="/login">Back to Login</Link>
         </div>
       </div>
     </div>
