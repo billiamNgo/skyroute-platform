@@ -1,0 +1,21 @@
+.dashboard-page {
+  min-height: 100vh;
+  padding: 40px;
+  background: linear-gradient(135deg, #e7f5f6, #a4d4d3);
+}
+
+.dashboard-container {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+.dashboard-title {
+  margin: 0 0 20px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2d3d;
+}
