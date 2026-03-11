@@ -2,8 +2,8 @@ jest.mock('./src/features/auth/auth.routes', () => {
     const express = require('express');
 
     return {
-        _esModule: true,
-        defualt: express.Router(),
+        __esModule: true,
+        default: express.Router(),
     };
 });
 
