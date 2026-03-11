@@ -22,4 +22,10 @@ describe('Server routes', () => {
 
     expect(res.status).toBe(401);
   });
+
+  it('GET /protected with invalid token returns 401', async () => {
+    const res = await request(app).get('/protected').set('Authorization', 'Bearer fake-token');
+
+    expect(res.status).toBe(401);
+  });
 });
