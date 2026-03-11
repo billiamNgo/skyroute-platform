@@ -6,36 +6,34 @@ export default function Welcome() {
 
     return ( 
         <div className="welcome-page">
-            <div className="welcome-overlay">
-                <div className="welcome-content">
-                    <img
-                    src="/drone.png"
-                    alt="SkyRoute drone"
-                    className="welcome-drone"
-                />
+            <div className="welcome-content">
+                <img
+                src="/drone.png"
+                alt="SkyRoute drone"
+                className="welcome-drone"
+            />
 
-                <h1 className="welcome-title">Welcome to SkyRoute</h1>
+            <h1 className="welcome-title">Welcome to Sky Route</h1>
 
-                <p className="welcome-text">
-                    SkyRoute is a drone-based pharmacy delivery system designed 
-                    to help customers recieve medication quickly and securely.
-                </p>
+            <p className="welcome-text">
+                Sky Route is a drone-based pharmacy delivery system designed 
+                to help customers recieve medication quickly and securely.
+            </p>
 
-                <div className="welcome-button-row">
-                    <button
-                        className="welcome-button primary"
-                        onClick={() => navigate("/login")}
-                        >
-                        Login
-                        </button>
+            <div className="welcome-button-row">
+                <button
+                    className="welcome-button"
+                    onClick={() => navigate("/login")}
+                    >
+                    Login
+                    </button>
                         
-                    <button
-                        className="welcome-button secondary"
-                        onClick={() => navigate("/register")}
-                        >
-                        Register
-                        </button>        
-                    </div>
+                <button
+                    className="welcome-button"
+                    onClick={() => navigate("/register")}
+                    >
+                    Register
+                    </button>        
                 </div>
             </div>
         </div>

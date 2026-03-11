@@ -68,7 +68,7 @@ export default function Register() {
     //localStorage.setItem("role", role);
     //localStorage.setItem("username", username);
 
-      setTimeout(() => navigate("/"), 700);
+      setTimeout(() => navigate("/login"), 700);
     } catch (error: any) { 
       setMessage(error.message || "Something went wrong.");
     } finally { 
@@ -179,7 +179,7 @@ export default function Register() {
 
         {/* Navigation button */}
         <div className="auth-link-row">
-          Already have an account? <Link to="/">Back to Login</Link>
+          Already have an account? <Link to="/login">Back to Login</Link>
         </div>
       </div>
     </div>
