@@ -85,3 +85,9 @@ body {
   margin-bottom: 16px;
   color: red;
 }
+
+.auth-logo {
+  display: block;
+  width: 150px;
+  margin: 0 auto 20px;
+}
