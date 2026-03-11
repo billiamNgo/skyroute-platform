@@ -7,8 +7,13 @@
         "strict": true,
         "lib": ["esnext"],
         "skipLibCheck": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "types": ["node", "jest"],
+        "paths": {
+            "@shared/*": ["../../shared/*"],
+            "@prisma/client": ["./generated/prisma"]
+        }
     },
-    "include": ["src/**/*.ts", "server.ts"],
+    "include": ["src/**/*.ts", "server.ts", "**/*.test.ts"],
     "exclude": ["node_modules"]
 }
