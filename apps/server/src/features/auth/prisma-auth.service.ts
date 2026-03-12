@@ -1,15 +1,23 @@
 import { PrismaClient, User as PrismaUser } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { AuthService } from './auth.service';
 import TokenService from '../token/token.service';
 import { Login } from '@shared/login.model';
 import { User } from '@shared/user.model';
 
 export class PrismaAuthService implements AuthService {
-    private prisma = new PrismaClient();
+    private prisma: PrismaClient;
     
-    constructor(private tokenService: TokenService) {}
+    constructor(private tokenService: TokenService) {
+        console.log('Database url:', process.env.DATABASE_URL);
+
+        const connectionString = process.env.DATABASE_URL;
+        const adapter = new PrismaPg({ connectionString });
+        this.prisma = new PrismaClient({ adapter });
+    }
     
     async register(userData: User): Promise<User> {
+        console.log('Userdata received: ', userData);
         return await this.prisma.user.create({
             data: {
                 email: userData.email,

@@ -11,6 +11,8 @@ RUN npm install
 
 COPY apps/server/ ./
 
+RUN npx prisma generate
+
 ENV PORT=8080
 EXPOSE 8080
 
