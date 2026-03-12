@@ -60,3 +60,8 @@ To reset the database:
 npx prisma migrate reset
 ```
 This command will reset the database and erase all previous data.
+
+## Video Demonstration
+Development Checkpoint 1 Demo Video:
+
+https://www.loom.com/share/33586033103142e0b117cd95e669bae1
