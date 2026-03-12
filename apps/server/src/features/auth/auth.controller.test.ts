@@ -95,13 +95,15 @@ describe('AuthController', () => {
             expect(res.json).toHaveBeenCalledWith(loginResult);
         });
 
-        it('propagates error when authService.login throws', async () => {
+        it('returns 401 with Invalid Credentials when authService.login throws', async () => {
             req = { body: loginBody };
-            mockAuthService.login.mockRejectedValue(new Error('Invalid credentials'));
+            // controller maps authentication failures to a 401 with message 'Invalid Credentials'
+            mockAuthService.login.mockRejectedValue(new Error('Invalid Credentials'));
 
-            await expect(
-                authController.login(req as Request, res as Response)
-            ).rejects.toThrow('Invalid credentials');
+            await authController.login(req as Request, res as Response);
+
+            expect(res.status).toHaveBeenCalledWith(401);
+            expect(res.json).toHaveBeenCalledWith({ message: 'Invalid Credentials' });
         });
     });
 
