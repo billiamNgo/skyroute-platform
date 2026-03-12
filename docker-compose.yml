@@ -5,10 +5,14 @@ services:
       dockerfile: apps/server/Dockerfile
     ports:
       - "8080:8080"
+    environment:
+      - DATABASE_URL=postgresql://SkyRouteAdmin:SkyR0uteP@55w0rd@db:5432/SkyRoute
     env_file:
       - apps/server/.env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    command: sh -c "npx prisma migrate deploy && npm start"
 
   client:
     build:
@@ -24,13 +28,17 @@ services:
   db:
     image: postgres
     restart: always
-    shm_size: 128mb
     ports:
       - 5432:5432
     environment:
       POSTGRES_USER: SkyRouteAdmin
       POSTGRES_PASSWORD: SkyR0uteP@55w0rd
       POSTGRES_DB: SkyRoute
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U SkyRouteAdmin -d SkyRoute"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   adminer:
     image: adminer
