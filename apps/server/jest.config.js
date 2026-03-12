@@ -8,7 +8,4 @@ module.exports = {
   transform: {
     ...tsJestTransformCfg,
   },
-  moduleNameMapper: {
-    "^@prisma/client$": "<rootDir>/generated/prisma"
-  },
 };

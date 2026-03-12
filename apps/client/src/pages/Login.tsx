@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Auth.css";
 
-const API_BASE = "http://localhost:3000";
+const API_BASE = "http://localhost:8080";
 
 export default function Login() {
     const navigate = useNavigate(); 
@@ -23,7 +23,7 @@ export default function Login() {
         try { 
             setLoading(true);
             
-            const response = await fetch(`${API_BASE}/login`, { 
+            const response = await fetch(`${API_BASE}/auth/login`, { 
                 method: "POST",
                 headers: { 
                     "Content-Type": "application/json",
