@@ -1,9 +1,11 @@
+import "./Dashboard.css"
+
 export default function AdminDashboard() {
   return (
-    <div style={{ backgroundColor: "white", minHeight: "100vh", padding: "40px" }}>
-      <h1 style={{ color: "black" }}>
-        Admin Dashboard
-      </h1>
+    <div className="dashboard-page">
+      <div className="dashboard-container">
+        <h1 className="dashboard-title"> Admin Dashboard</h1>
+      </div>
     </div>
   );
 }

@@ -8,10 +8,11 @@
         "lib": ["esnext"],
         "skipLibCheck": true,
         "esModuleInterop": true,
+        "types": ["node", "jest"],
         "paths": {
             "@shared/*": ["../../shared/*"],
         }
     },
-    "include": ["src/**/*.ts", "server.ts"],
+    "include": ["src/**/*.ts", "server.ts", "**/*.test.ts"],
     "exclude": ["node_modules"]
 }
