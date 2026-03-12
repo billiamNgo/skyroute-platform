@@ -3,6 +3,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { AuthService } from './auth.service';
 import TokenService from '../token/token.service';
 import { Login } from '@shared/login.model';
+import bcrypt from 'bcryptjs';
 import { User } from '@shared/user.model';
 
 export class PrismaAuthService implements AuthService {
@@ -19,15 +20,23 @@ export class PrismaAuthService implements AuthService {
     async register(userData: User): Promise<User> {
         console.log('Userdata received: ', userData);
         try {
-            return await this.prisma.user.create({
+            // hash the password before saving
+            const hashed = await bcrypt.hash(userData.password, 10);
+
+            const created = await this.prisma.user.create({
                 data: {
                     email: userData.email,
                     firstName: userData.firstName,
                     lastName: userData.lastName,
-                    password: userData.password,
+                    password: hashed,
                     role: userData.role,
                 },
             });
+
+            // remove password before returning
+            // @ts-ignore
+            const { password, ...safe } = created;
+            return safe as User;
         } catch (error: any) {
             console.error('Full error:', JSON.stringify(error, null, 2));
             console.error('Error code:', error.code);
@@ -43,12 +52,22 @@ export class PrismaAuthService implements AuthService {
             where: { email } 
         });
 
-        if (!user || user.password !== password) {
+        if (!user) {
+            throw new Error('Invalid credentials');
+        }
+
+        // compare supplied password with stored hash
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
             throw new Error('Invalid credentials');
         }
 
         const token = await this.tokenService.generateToken(user);
-        return { user, token };
+
+        // strip password from returned user
+        // @ts-ignore
+        const { password: _p, ...safe } = user;
+        return { user: safe as User, token };
     }
 
     async logout(token: string): Promise<void> {
