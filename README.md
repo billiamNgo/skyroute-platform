@@ -22,12 +22,8 @@ sudo docker-compose down
 sudo docker-compose up --build
 ```
 
-If you want to add to the prisma schema run the following commands while the docker container is already running:
-```
-cd ./apps/server
-npx prisma migrate dev --name init
-npx prisma generate
-```
+If you want to add to the prisma schema rebuild the containter.
+
 
 ## Tests
 
@@ -43,7 +39,7 @@ This will run the code using the testing environment.
 Create a .env file in the ./apps/server directory
 
 ```
-DATABASE_URL="postgresql://SkyRouteAdmin:SkyR0uteP@55w0rd@localhost:5432/SkyRoute"
+DATABASE_URL="postgresql://SkyRouteAdmin:SkyR0uteP@55w0rd@db:5432/SkyRoute"
 JWT_SECRET="asdf"
 JWT_EXPIRES_IN="1h"
 ```
@@ -57,12 +53,7 @@ Ensure that you have prisma installed globally by running
 npm install -g prisma
 ```
 
-To create the database files, you need to run a migration. You must enter these commands while the docker container is running:
-```
-cd ./apps/server
-npx prisma generate
-npx prisma migrate dev --name init
-```
+The database files are migrated automatically.
 
 To reset the database:
 ```

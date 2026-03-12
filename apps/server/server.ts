@@ -25,6 +25,8 @@ app.get('/', (req, res) => {
   res.send('All is well! Connected to the server!');
 });
 
+app.use('/auth', authRoutes);
+
 app.get('/protected', security.authenticateJWT, (req, res) => {
   res.json({ ok: true, user: (req as any).user });
 });

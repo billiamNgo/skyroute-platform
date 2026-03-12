@@ -1,24 +1,40 @@
 import { PrismaClient, User as PrismaUser } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { AuthService } from './auth.service';
 import TokenService from '../token/token.service';
 import { Login } from '@shared/login.model';
 import { User } from '@shared/user.model';
 
 export class PrismaAuthService implements AuthService {
-    private prisma = new PrismaClient();
+    private prisma: PrismaClient;
     
-    constructor(private tokenService: TokenService) {}
+    constructor(private tokenService: TokenService) {
+        console.log('Database url:', process.env.DATABASE_URL);
+
+        const connectionString = process.env.DATABASE_URL;
+        const adapter = new PrismaPg({ connectionString });
+        this.prisma = new PrismaClient({ adapter });
+    }
     
     async register(userData: User): Promise<User> {
-        return await this.prisma.user.create({
-            data: {
-                email: userData.email,
-                firstName: userData.firstName,
-                lastName: userData.lastName,
-                password: userData.password,
-                role: userData.role,
-            },
-        });
+        console.log('Userdata received: ', userData);
+        try {
+            return await this.prisma.user.create({
+                data: {
+                    email: userData.email,
+                    firstName: userData.firstName,
+                    lastName: userData.lastName,
+                    password: userData.password,
+                    role: userData.role,
+                },
+            });
+        } catch (error: any) {
+            console.error('Full error:', JSON.stringify(error, null, 2));
+            console.error('Error code:', error.code);
+            console.error('Error meta:', error.meta);
+            console.error('Error message:', error.message);
+            throw error;
+        }
     }
 
     async login(credential: Login): Promise<{ user: User; token: string }> {

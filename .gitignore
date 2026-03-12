@@ -89,6 +89,7 @@ sketch
 # Keep environment variables out of version control
 apps/server/.env
 apps/server/src/generated/prisma
+*.sql
 
 
 ### Windows ###
