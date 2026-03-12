@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Auth.css"
 
-const API_BASE = "http://localhost:3000";
+const API_BASE = "http://localhost:8080";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ export default function Register() {
       //await new Promise((r) => setTimeout(r, 400));
       //setLoading(false);
 
-      const response = await fetch(`${API_BASE}/register`, {
+      const response = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json"
