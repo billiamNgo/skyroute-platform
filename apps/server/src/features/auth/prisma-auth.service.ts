@@ -71,6 +71,13 @@ export class PrismaAuthService implements AuthService {
     }
 
     async logout(token: string): Promise<void> {
-        // Invalidate token here
+        // Add token to revoke list so future use is rejected
+        try {
+            if (typeof (this.tokenService as any).revokeToken === 'function') {
+                await (this.tokenService as any).revokeToken(token);
+            }
+        } catch (err) {
+            console.error('Error revoking token', err);
+        }
     }
 }
