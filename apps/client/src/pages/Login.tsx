@@ -49,9 +49,14 @@ export default function Login() {
         setTimeout(() => {
             if (data.user.role === "admin") navigate("/admin");
             else if (data.user.role === "pharmacist") navigate("/pharmacist");
-            else navigate("/technician");
+            else if (data.user.role === "technician") navigate("/technician");
+            else { 
+                localStorage.removeItem("token");
+                localStorage.removeItem("role");
+                localStorage.removeItem("email");
+                setMessage("Unknown user role.");
+            }
         }, 300);
-
         } catch (error: any) { 
             setMessage(error.message || "Something went wrong.")
         } finally { 

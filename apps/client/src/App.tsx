@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-
 import TechnicianDashboard from "./pages/TechnicianDashboard";
 import PharmacistDashboard from "./pages/PharmacistDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
