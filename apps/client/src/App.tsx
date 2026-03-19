@@ -14,9 +14,33 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        <Route path="/technician" element={<TechnicianDashboard />} />
-        <Route path="/pharmacist" element={<PharmacistDashboard />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route 
+          path="/technician" 
+          element={
+            <ProtectedRoute allowedRole="technician">
+              <TechnicianDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route 
+          path="/pharmacist" 
+          element={
+            <ProtectedRoute allowedRole="pharmacist">
+              <PharmacistDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute allowedRole="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
