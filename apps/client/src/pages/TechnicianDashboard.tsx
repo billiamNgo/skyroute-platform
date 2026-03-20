@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../utils/auth";
 import "./Dashboard.css"
+import "./OrdersPage.css";
 
 export default function TechnicianDashboard() {
   const navigate = useNavigate();
@@ -14,16 +15,21 @@ export default function TechnicianDashboard() {
       <div className="dashboard-container">
         <h1 className="dashboard-title"> Technician Dashboard</h1>
 
-        <button
-          className="dashboard-button"
-          onClick={() => navigate("/orders")}
+        <div className="dashboard-actions">
+          <button
+            className="orders-tab"
+            onClick={() => navigate("/orders")}
           >
             View Orders
           </button>
 
-        <button className="dashboard-button" onClick={handleLogout}>
-          Logout
-        </button>
+          <button 
+            className="dashboard-danger-button" 
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        </div>
       </div>
     </div>
   );

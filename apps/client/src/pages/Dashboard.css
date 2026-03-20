@@ -19,3 +19,26 @@
   font-weight: 700;
   color: #1f2d3d;
 }
+
+.dashboard-danger-button {
+  border: none;
+  background: #ef4444;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dashboard-danger-button:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(239, 68, 68, 0.25);
+}
+
+.dashboard-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
