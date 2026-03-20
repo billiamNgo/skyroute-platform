@@ -1,8 +1,9 @@
 import { Navigate } from "react-router-dom";
 import { getRole, getToken } from "../utils/auth";
+import type { ReactElement } from "react";
 
 type ProtectedRouteProps = { 
-    component: JSX.Element;
+    component: ReactElement;
     allowedRole: "admin" | "pharmacist" | "technician";
 };
 
