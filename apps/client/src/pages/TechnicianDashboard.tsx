@@ -1,23 +1,24 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+//import { useEffect } from "react";
+//import { useNavigate } from "react-router-dom";
+import { logoutUser } from "../utils/auth";
 import "./Dashboard.css"
 
-const API_BASE = "http://localhost:8080";
+//const API_BASE = "http://localhost:8080";
 
 export default function TechnicianDashboard() {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
-  useEffect(() => { 
+  /**useEffect(() => { 
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
     if (!token || role !== "technician") { 
       navigate("/login");
     }
-  }, [navigate]);
+  }, [navigate]); **/
 
 const handleLogout = async () => { 
-  const token = localStorage.getItem("token");
+  /**const token = localStorage.getItem("token");
 
   try { 
     await fetch(`${API_BASE}/auth/logout`, { 
@@ -34,7 +35,8 @@ const handleLogout = async () => {
     localStorage.removeItem("role");
     localStorage.removeItem("email");
     navigate("/login");
-  }
+  } **/
+  await logoutUser();
 };
 
   return (

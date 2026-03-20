@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import type { FormEvent } from "react";
 import "./Auth.css";
 
 const API_BASE = "http://localhost:8080";
@@ -13,7 +14,7 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
 
-    const handleSubmit = async (e: React.FormEvent) => { 
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => { 
         e.preventDefault();
         setMessage("");
 
