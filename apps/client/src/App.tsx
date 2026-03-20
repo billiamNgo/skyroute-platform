@@ -17,28 +17,30 @@ function App() {
         <Route 
           path="/technician" 
           element={
-            <ProtectedRoute allowedRole="technician">
-              <TechnicianDashboard />
-            </ProtectedRoute>
+            <ProtectedRoute 
+              allowedRole="technician"
+              component={<TechnicianDashboard />}
+            />
           }
         />
 
         <Route 
           path="/pharmacist" 
           element={
-            <ProtectedRoute allowedRole="pharmacist">
-              <PharmacistDashboard />
-            </ProtectedRoute>
+            <ProtectedRoute 
+              allowedRole="pharmacist"
+              component={<PharmacistDashboard />}
+            />
           }
         />
-
 
         <Route 
           path="/admin" 
           element={
-            <ProtectedRoute allowedRole="admin">
-              <AdminDashboard />
-            </ProtectedRoute>
+            <ProtectedRoute 
+              allowedRole="admin"
+              component={<AdminDashboard />}
+            />
           }
         />
 
