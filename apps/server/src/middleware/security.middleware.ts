@@ -19,6 +19,11 @@ export default function SecurityMiddleware(tokenService: TokenService) {
     try {
       const verified = await tokenService.verifyToken(token);
       if (!verified) return res.sendStatus(401);
+      // check token revocation / blacklist
+      if (typeof (tokenService as any).isRevoked === 'function') {
+        const revoked = await (tokenService as any).isRevoked(token);
+        if (revoked) return res.status(401).json({ status: 'fail', message: 'Token revoked' });
+      }
       // support payload shape { user } or direct payload
       req.user = (verified as any).user ?? verified;
       return next();

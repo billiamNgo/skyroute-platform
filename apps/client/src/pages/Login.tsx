@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import type { FormEvent } from "react";
+import { setAuth, clearAuth } from "../utils/auth"
 import "./Auth.css";
 
 const API_BASE = "http://localhost:8080";
@@ -13,7 +15,7 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
 
-    const handleSubmit = async (e: React.FormEvent) => { 
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => { 
         e.preventDefault();
         setMessage("");
 
@@ -40,18 +42,23 @@ export default function Login() {
             throw new Error(data.message || "Login failed.")
         }
 
-        localStorage.setItem("token", data.token);
+        setAuth(data.token, data.user.role, data.user.email);
+
+        /** localStorage.setItem("token", data.token);
         localStorage.setItem("role", data.user.role); 
-        localStorage.setItem("email", data.user.email);
+        localStorage.setItem("email", data.user.email); **/
         
         setMessage("Login successful. Redirecting...");
 
         setTimeout(() => {
             if (data.user.role === "admin") navigate("/admin");
             else if (data.user.role === "pharmacist") navigate("/pharmacist");
-            else navigate("/technician");
+            else if (data.user.role === "technician") navigate("/technician");
+            else { 
+                clearAuth();
+                setMessage("Unknown user role.");
+            }
         }, 300);
-
         } catch (error: any) { 
             setMessage(error.message || "Something went wrong.")
         } finally { 

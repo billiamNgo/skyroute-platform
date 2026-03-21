@@ -41,8 +41,6 @@ export default function Register() {
     
     try {
       setLoading(true);
-      //await new Promise((r) => setTimeout(r, 400));
-      //setLoading(false);
 
       const response = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
@@ -65,10 +63,6 @@ export default function Register() {
       }
 
       setMessage("Registration successful. Redirecting...");
-
-    //localStorage.setItem("role", role);
-    //localStorage.setItem("username", username);
-
       setTimeout(() => navigate("/login"), 700);
     } catch (error: any) { 
       setMessage(error.message || "Something went wrong.");
