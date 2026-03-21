@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../utils/auth";
 import OrdersList from "../components/OrdersList";
 import "./OrdersPage.css";
+import "./Dashboard.css"
 
 type Order = { 
     id: string;

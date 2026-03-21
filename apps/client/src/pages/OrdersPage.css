@@ -126,4 +126,37 @@
   .orders-nav {
     justify-content: flex-start;
   }
+
+}
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  background: white;
+  overflow: hidden;
+}
+
+.orders-table thead tr {
+  background: #f3f4f6;
+}
+
+.orders-table th,
+.orders-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #d1d5db;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.orders-table th {
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.orders-table td {
+  color: #374151;
+}
+
+.orders-table tbody tr:hover {
+  background: #f9fafb;
 }
