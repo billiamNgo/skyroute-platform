@@ -1,6 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../utils/auth";
+import OrdersList from "../components/OrdersList";
 import "./OrdersPage.css";
+
+type Order = { 
+    id: string;
+    customerName: string;
+    address: string;
+    distance: string;
+    status: string;
+};
 
 export default function OrdersPage() { 
     const navigate = useNavigate(); 
@@ -8,6 +17,30 @@ export default function OrdersPage() {
     const handleLogout = async () => { 
         await logoutUser();
     };
+
+    const orders: Order[] = [ 
+        { 
+            id: "ORD-001",
+            customerName: "John Doe",
+            address: "123 Main St",
+            distance: "2.4 miles",
+            status: "Pending",
+        },
+        {
+            id: "ORD-002",
+            customerName: "Jane Adams",
+            address: "405 Oak Ave",
+            distance: "4.1 miles",
+            status: "Assigned",
+        },
+        {
+            id: "ORD-003",
+            customerName: "Patrick Smith",
+            address: "307 Bear Ln",
+            distance: "1.8 miles",
+            status: "In-Transit",
+        },
+    ];
 
     return (
         <div className="dashboard-page">
@@ -52,12 +85,7 @@ export default function OrdersPage() {
                 <div className="orders-layout">
                     <div className="orders-list-panel">
                         <h2 className="orders-section-title">Select an Order:</h2>
-
-                        <div className="order-card-placeholder">Order placeholder</div>
-                        <div className="order-card-placeholder">Order placeholder</div>
-                        <div className="order-card-placeholder">Order placeholder</div>
-                        <div className="order-card-placeholder">Order placeholder</div>
-                        <div className="order-card-placeholder">Order placeholder</div>
+                        <OrdersList orders={orders} />
                     </div>
 
                     <div className="orders-details-panel">
