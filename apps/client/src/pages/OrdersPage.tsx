@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../utils/auth";
 import OrdersList from "../components/OrdersList";
@@ -43,6 +44,8 @@ export default function OrdersPage() {
         },
     ];
 
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
     return (
         <div className="dashboard-page">
             <div className="dashboard-container orders-page-container">
@@ -86,22 +89,53 @@ export default function OrdersPage() {
                 <div className="orders-layout">
                     <div className="orders-list-panel">
                         <h2 className="orders-section-title">Select an Order:</h2>
-                        <OrdersList orders={orders} />
+                        <OrdersList 
+                        orders={orders} 
+                        onSelect={setSelectedOrder}
+                        selectedOrderId={selectedOrder?.id}
+                        />
                     </div>
 
                     <div className="orders-details-panel">
                         <h2 className="orders-section-title">Order Details:</h2>
 
+                    {selectedOrder ? ( 
+                        <div className="order-details-card">
+                            <p>
+                                <strong>Order ID:</strong> {selectedOrder.id}
+                            </p>
+                            <p>
+                                <strong>Customer:</strong> {selectedOrder.customerName}
+                            </p>
+                            <p>
+                                <strong>Address:</strong> {selectedOrder.address}
+                            </p>
+                            <p>
+                                <strong>Distance:</strong> {selectedOrder.distance}
+                            </p>
+                            <p>
+                                <strong>Status:</strong> {selectedOrder.status}
+                            </p>
+                        </div>
+
+                    ) : ( 
                     <div className="order-details-placeholder">
-                        Details panel placeholder
+                        Select an order to view details
                     </div>
+                )}
 
                     <div className="orders-action-group">
-                        <button className="orders-action-button orders-primary-button">
+                        <button 
+                            className="orders-action-button orders-primary-button"
+                            disabled={!selectedOrder}
+                        >
                             Assign Drone
                         </button>
 
-                        <button className="orders-action-button dashboard-danger-button">
+                        <button 
+                            className="orders-action-button dashboard-danger-button"
+                            disabled={!selectedOrder}
+                        >
                             Cancel Order
                         </button>
                     </div>

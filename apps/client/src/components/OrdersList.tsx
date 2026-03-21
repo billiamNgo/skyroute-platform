@@ -8,9 +8,15 @@ type Order = {
 
 type Props = { 
     orders: Order[];
+    onSelect: (order: Order) => void;
+    selectedOrderId?: string;
 };
 
-export default function OrdersList({ orders }: Props) {
+export default function OrdersList({ 
+    orders,
+    onSelect,
+    selectedOrderId, 
+}: Props) {
     if (orders.length === 0) { 
         return <p className="orders-message">No orders found.</p>;
     }
@@ -29,7 +35,11 @@ export default function OrdersList({ orders }: Props) {
             
             <tbody> 
                 {orders.map((order) => ( 
-                    <tr key={order.id}>
+                    <tr 
+                        key={order.id}
+                        onClick={() => onSelect(order)}
+                        className={selectedOrderId === order.id ? "selected-order-row" : ""}
+                    >
                         <td>{order.id}</td>
                         <td>{order.customerName}</td>
                         <td>{order.address}</td>
