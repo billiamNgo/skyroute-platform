@@ -1,0 +1,129 @@
+.orders-page-container {
+  padding-top: 24px;
+}
+
+.orders-topbar,
+.orders-nav,
+.orders-action-group {
+  display: flex;
+}
+
+.orders-topbar {
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.orders-nav {
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  flex: 1;
+}
+
+.orders-tab {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 22px;
+  background: #eef2f7;
+  color: #1f2937;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.orders-tab:hover,
+.orders-action-button:hover {
+  transform: translateY(-1px);
+}
+
+.orders-tab:hover {
+  background: #e2e8f0;
+}
+
+.orders-tab.active-tab {
+  background: linear-gradient(90deg, #43b7b1, #8ec9c7);
+  color: white;
+  box-shadow: 0 6px 14px rgba(67, 183, 177, 0.25);
+}
+
+.orders-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.orders-list-panel,
+.orders-details-panel {
+  padding: 20px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.orders-section-title {
+  margin-bottom: 16px;
+  color: #1f2937;
+}
+
+.order-card-placeholder,
+.order-details-placeholder {
+  border-radius: 10px;
+  background: #f9fafb;
+}
+
+.order-card-placeholder {
+  margin-bottom: 16px;
+  padding: 18px;
+  border: 1px solid #d1d5db;
+  color: #374151;
+}
+
+.order-details-placeholder {
+  height: 220px;
+  margin-bottom: 16px;
+  border: 1px dashed #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+}
+
+.orders-action-group {
+  flex-direction: column;
+  gap: 12px;
+}
+
+.orders-action-button {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.orders-primary-button {
+  background: linear-gradient(90deg, #43b7b1, #8ec9c7);
+  color: white;
+  box-shadow: 0 6px 14px rgba(67, 183, 177, 0.25);
+}
+
+@media (max-width: 900px) {
+  .orders-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .orders-topbar {
+    align-items: stretch;
+  }
+
+  .orders-nav {
+    justify-content: flex-start;
+  }
+}

@@ -6,6 +6,7 @@ import Register from "./pages/Register";
 import TechnicianDashboard from "./pages/TechnicianDashboard";
 import PharmacistDashboard from "./pages/PharmacistDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import OrdersPage from "./pages/OrdersPage"
 
 function App() {
   return (
@@ -21,6 +22,16 @@ function App() {
             <ProtectedRoute 
               allowedRole="technician"
               component={<TechnicianDashboard />}
+            />
+          }
+        />
+
+        <Route 
+          path="/orders"
+          element={
+            <ProtectedRoute
+              allowedRole="technician"
+              component={<OrdersPage />}
             />
           }
         />
