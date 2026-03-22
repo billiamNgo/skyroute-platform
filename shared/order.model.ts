@@ -1,15 +1,20 @@
 export interface Order {
     orderID: number;
-    droneID?: number | null;
     pharmacyID: number;
-    customerLastName: string;
+    droneID?: number | null;
     customerFirstName: string;
+    customerLastName: string;
     address: string;
     city: string;
     state: string;
     zip: number;
-    status: OrderStatus;
+    status: string;
     medicationName: string;
 }
 
-export type OrderStatus = 'pending' | 'in-progress' | 'delivered' | 'cancelled';
+export enum OrderStatus {
+    PENDING = "PENDING",
+    IN_TRANSIT = "IN_TRANSIT",
+    DELIVERED = "DELIVERED",
+    CANCELLED = "CANCELLED"
+}
