@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node server.ts",
-    "dev": "nodemon server.ts",
+    "start": "ts-node -r tsconfig-paths/register server.ts",
+    "dev": "nodemon --exec \"ts-node -r tsconfig-paths/register\" server.ts",
     "test": "jest"
   },
   "keywords": [],
@@ -36,6 +36,7 @@
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },

@@ -8,7 +8,7 @@ export interface Order {
     city: string;
     state: string;
     zip: number;
-    status: string;
+    status?: string;
     medicationName: string;
 }
 
