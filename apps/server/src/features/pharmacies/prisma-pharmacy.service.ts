@@ -19,14 +19,14 @@ export class PrismaPharmacyService implements PharmacyService {
         try {
             return await this.prisma.orders.create({
                 data: {
-                    pharmacyID: pharmacyID,
-                    customerFirstName: orderData.firstName,
-                    customerLastName: orderData.lastName,
+                    pharmacyID,
+                    customerFirstName: orderData.customerFirstName,
+                    customerLastName: orderData.customerLastName,
                     address: orderData.address,
                     city: orderData.city,
                     state: orderData.state,
-                    zip: orderData.zip,
-                    medicationName: orderData.medication,
+                    zip: Number(orderData.zip),
+                    medicationName: orderData.medicationName,
                     status: OrderStatus.PENDING,
                 }
             });

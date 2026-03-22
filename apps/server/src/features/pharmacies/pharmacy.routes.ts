@@ -8,6 +8,6 @@ const router = Router();
 const pharmacyService = new PrismaPharmacyService();
 const pharmacyController = new PharmacyController(pharmacyService);
 
-router.post('/new-order', pharmacyController.ingestOrder);
+router.post('/:pharmacyID/new-order', pharmacyController.ingestOrder);
 
 export default router;
