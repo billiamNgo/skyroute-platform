@@ -11,13 +11,27 @@ type Order = {
     address: string;
     distance: string;
     status: string;
+    packageWeight: string;
+    medication: string;
+    eta: string;
 };
 
 export default function OrdersPage() { 
     const navigate = useNavigate(); 
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
     const handleLogout = async () => { 
         await logoutUser();
+    };
+
+    const handleAssignDrone = () => { 
+        if (!selectedOrder) return;
+        alert(`Assigning drone to order ${selectedOrder.id}`);
+    };
+
+    const handleCancelOrder = () => { 
+        if (!selectedOrder) return;
+        alert(`Cancelling order ${selectedOrder.id}`);
     };
 
     const orders: Order[] = [ 
@@ -27,6 +41,9 @@ export default function OrdersPage() {
             address: "123 Main St",
             distance: "2.4 miles",
             status: "Pending",
+            packageWeight: "2.1 oz",
+            medication: "Amoxicillian 500mg",
+            eta: "18 minutes",
         },
         {
             id: "ORD-002",
@@ -34,6 +51,9 @@ export default function OrdersPage() {
             address: "405 Oak Ave",
             distance: "4.1 miles",
             status: "Assigned",
+            packageWeight: "1.4 oz",
+            medication: "Insulin",
+            eta: "25 minutes",
         },
         {
             id: "ORD-003",
@@ -41,10 +61,11 @@ export default function OrdersPage() {
             address: "307 Bear Ln",
             distance: "1.8 miles",
             status: "In-Transit",
+            packageWeight: "0.9 oz",
+            medication: "Blood Pressure Medication",
+            eta: "10 minutes",
         },
     ];
-
-    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
     return (
         <div className="dashboard-page">
@@ -116,6 +137,15 @@ export default function OrdersPage() {
                             <p>
                                 <strong>Status:</strong> {selectedOrder.status}
                             </p>
+                            <p>
+                                <strong>Package Weight:</strong> {selectedOrder.packageWeight}
+                            </p>
+                            <p>
+                                <strong>Medication:</strong> {selectedOrder.medication}
+                            </p>
+                            <p>
+                                <strong>ETA:</strong> {selectedOrder.eta}
+                            </p>
                         </div>
 
                     ) : ( 
@@ -127,6 +157,7 @@ export default function OrdersPage() {
                     <div className="orders-action-group">
                         <button 
                             className="orders-action-button orders-primary-button"
+                            onClick={handleAssignDrone}
                             disabled={!selectedOrder}
                         >
                             Assign Drone
@@ -134,6 +165,7 @@ export default function OrdersPage() {
 
                         <button 
                             className="orders-action-button dashboard-danger-button"
+                            onClick={handleCancelOrder}
                             disabled={!selectedOrder}
                         >
                             Cancel Order

@@ -4,6 +4,9 @@ type Order = {
     address: string;
     distance: string;
     status: string;
+    packageWeight: string;
+    medication: string,
+    eta: string;
 };
 
 type Props = { 
