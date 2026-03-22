@@ -69,27 +69,22 @@
   color: #1f2937;
 }
 
-.order-card-placeholder,
-.order-details-placeholder {
-  border-radius: 10px;
-  background: #f9fafb;
-}
-
-.order-card-placeholder {
+.order-details-card {
+  min-height: 220px;
   margin-bottom: 16px;
   padding: 18px;
   border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #f9fafb;
   color: #374151;
 }
 
-.order-details-placeholder {
-  height: 220px;
-  margin-bottom: 16px;
-  border: 1px dashed #9ca3af;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6b7280;
+.orders-action-button:disabled,
+.dashboard-danger-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .orders-action-group {
@@ -126,14 +121,16 @@
   .orders-nav {
     justify-content: flex-start;
   }
-
 }
+
 .orders-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 8px;
   background: white;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .orders-table thead tr {
@@ -143,8 +140,8 @@
 .orders-table th,
 .orders-table td {
   padding: 12px 16px;
-  border-bottom: 1px solid #d1d5db;
   text-align: left;
+  border-bottom: 1px solid #d1d5db;
   font-size: 0.95rem;
 }
 
@@ -157,6 +154,15 @@
   color: #374151;
 }
 
-.orders-table tbody tr:hover {
-  background: #f9fafb;
+.orders-table tbody tr {
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.selected-order-row {
+  background: #e6f7f6;
+}
+
+.selected-order-row:hover {
+  background: #dff4f2;
 }
