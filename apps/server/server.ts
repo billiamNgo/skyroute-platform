@@ -25,7 +25,7 @@ app.use(express.json());
 
 // 4. Feature Routes
 app.use('/auth', authRoutes);
-app.use('/pharmacy', pharmacyRoutes);
+app.use('/pharmacy', pharmacyRoutes(security));
 
 // 5. Test route
 app.get('/', (req, res) => {
