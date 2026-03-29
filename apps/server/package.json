@@ -42,4 +42,8 @@
     "typescript": "^5.9.3"
   },
   "description": ""
+  ,
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  }
 }

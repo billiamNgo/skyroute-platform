@@ -34,12 +34,23 @@ const makeSecurity = () => ({
       req.user = { id: 2, role: 'pharmacist' };
       return next();
     }
+    if (parts[1] === 'pharmacytoken') {
+      req.user = { id: 3, role: 'pharmacy' };
+      return next();
+    }
     return res.sendStatus(401);
   },
+
   isPharmacist: (req: any, res: any, next: any) => {
     if (!req.user) return res.sendStatus(401);
     if (req.user.role === 'pharmacist') return next();
     return res.status(403).json({ status: 'fail', message: 'This action is for pharmacists only' });
+  },
+
+  isPharmacy: (req: any, res: any, next: any) => {
+    if (!req.user) return res.sendStatus(401);
+    if (req.user.role === 'pharmacy') return next();
+    return res.status(403).json({ status: 'fail', message: 'This action is for pharmacies only' });
   }
 });
 
@@ -57,20 +68,30 @@ describe('Pharmacy Routes', () => {
     expect(res.status).toBe(401);
   });
 
-  it('POST /pharmacy/:pharmacyID/new-order with non-pharmacist token returns 403', async () => {
+  it('POST /pharmacy/:pharmacyID/new-order with non-pharmacy token returns 403', async () => {
     const res = await request(app)
       .post('/pharmacy/1/new-order')
       .set('Authorization', 'Bearer validtoken')
       .send({});
 
     expect(res.status).toBe(403);
-    expect(res.body).toHaveProperty('message', 'This action is for pharmacists only');
+    expect(res.body).toHaveProperty('message', 'This action is for pharmacies only');
   });
 
-  it('POST /pharmacy/:pharmacyID/new-order with pharmacist token returns 201', async () => {
+  it('POST /pharmacy/:pharmacyID/new-order with pharmacist token returns 403', async () => {
     const res = await request(app)
       .post('/pharmacy/1/new-order')
       .set('Authorization', 'Bearer pharmacisttoken')
+      .send({});
+
+    expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('message', 'This action is for pharmacies only');
+  });
+
+  it('POST /pharmacy/:pharmacyID/new-order with pharmacy token returns 201', async () => {
+    const res = await request(app)
+      .post('/pharmacy/1/new-order')
+      .set('Authorization', 'Bearer pharmacytoken')
       .send({});
 
     expect(res.status).toBe(201);

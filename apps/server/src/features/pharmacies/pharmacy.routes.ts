@@ -10,11 +10,11 @@ export default function pharmacyRoutes(security: any) {
 	const pharmacyService = new PrismaPharmacyService();
 	const pharmacyController = new PharmacyController(pharmacyService);
 
-	// Require JWT authentication and pharmacist role for creating new orders
+	// Require JWT authentication and pharmacy role for creating new orders
 	router.post(
 		'/:pharmacyID/new-order',
 		security.authenticateJWT,
-		security.isPharmacist,
+        security.isPharmacy,
 		pharmacyController.ingestOrder
 	);
 
