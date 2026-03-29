@@ -1,7 +1,12 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg' // Example for PostgreSQL
+import { Pool } from 'pg'
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+const adapter = new PrismaPg(pool)
+const prisma = new PrismaClient({ adapter })
+
 
 async function main() {
   // Define three pharmacies
@@ -21,7 +26,7 @@ async function main() {
       zip: 90002,
     },
     {
-      name: 'Wallgreens',
+      name: 'Walgreens',
       address: '300 East Blvd',
       city: 'Pace',
       state: 'FL',
@@ -32,32 +37,52 @@ async function main() {
   console.log('Seeding pharmacies and service accounts...');
 
   for (const p of pharmacies) {
-    const created = await prisma.pharmacies.create({
-      data: {
-        name: p.name,
-        address: p.address,
-        city: p.city,
-        state: p.state,
-        zip: p.zip,
-      },
-    });
+    // ensure pharmacy exists (idempotent)
+    let pharmacy = await prisma.pharmacies.findFirst({ where: { name: p.name } });
+    if (!pharmacy) {
+      pharmacy = await prisma.pharmacies.create({
+        data: {
+          name: p.name,
+          address: p.address,
+          city: p.city,
+          state: p.state,
+          zip: p.zip,
+        },
+      });
+      console.log(`Created pharmacy ${pharmacy.name} (id=${pharmacy.pharmacyID})`);
+    } else {
+      console.log(`Found existing pharmacy ${pharmacy.name} (id=${pharmacy.pharmacyID})`);
+    }
 
     const serviceName = `${p.name}-service`;
-    const emailLocal = 'service@' + p.name.toLowerCase() + '.com';
-    const rawPassword = 'ChangeMe!23';
+    const emailLocal = 'service@' + p.name.toLowerCase().replace(/\s+/g, '') + '.com';
+
+    // password resolution: per-pharmacy env var, then generic SERVICE_ACCOUNT_PASSWORD, then fallback
+    const envKey = `SERVICE_PASSWORD_${p.name.toUpperCase().replace(/\W+/g, '_')}`;
+    const rawPassword = process.env[envKey] || process.env.SERVICE_ACCOUNT_PASSWORD || 'ChangeMe!23';
     const hashed = await bcrypt.hash(rawPassword, 10);
 
-    const user = await prisma.user.create({
-      data: {
+    const user = await prisma.user.upsert({
+      where: { email: emailLocal },
+      create: {
         email: emailLocal,
         firstName: serviceName,
         lastName: 'Service',
         password: hashed,
         role: 'pharmacy',
+        pharmacyID: pharmacy.pharmacyID,
+      },
+      update: {
+        // keep service account details in sync; update password and pharmacy linkage
+        firstName: serviceName,
+        lastName: 'Service',
+        password: hashed,
+        role: 'pharmacy',
+        pharmacyID: pharmacy.pharmacyID,
       },
     });
 
-    console.log(`Created pharmacy ${created.name} (id=${created.pharmacyID}) and service account ${user.email}`);
+    console.log(`Ensured service account ${user.email} for pharmacy ${pharmacy.name}`);
   }
 
   console.log('Seeding complete.');
