@@ -25,7 +25,7 @@ const makeSecurity = () => ({
     if (!auth) return res.sendStatus(401);
     const parts = auth.split(' ');
     if (parts.length !== 2 || parts[0] !== 'Bearer') return res.sendStatus(401);
-    // support two test tokens: 'validtoken' => customer, 'pharmacisttoken' => pharmacist
+    // support three test tokens: 'validtoken' => customer, 'pharmacisttoken' => pharmacist, 'pharmacytoken' => pharmacy
     if (parts[1] === 'validtoken') {
       req.user = { id: 1, role: 'customer' };
       return next();
