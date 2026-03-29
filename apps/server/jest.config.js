@@ -8,6 +8,7 @@ module.exports = {
   transform: {
     ...tsJestTransformCfg,
   },
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   moduleNameMapper: {
     "@shared/(.*)": "<rootDir>/../../shared/$1",
   }

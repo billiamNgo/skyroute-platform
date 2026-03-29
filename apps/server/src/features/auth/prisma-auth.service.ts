@@ -1,6 +1,6 @@
 import { PrismaClient, User as PrismaUser } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { AuthService } from './auth.service';
+import { AuthService, PublicUser } from './auth.service';
 import TokenService from '../token/token.service';
 import { Login } from '@shared/login.model';
 import bcrypt from 'bcryptjs';
@@ -17,7 +17,7 @@ export class PrismaAuthService implements AuthService {
         this.prisma = new PrismaClient({ adapter });
     }
     
-    async register(userData: User): Promise<User> {
+    async register(userData: User): Promise<PublicUser> {
         console.log('Userdata received: ', userData);
         try {
             // hash the password before saving
@@ -34,9 +34,8 @@ export class PrismaAuthService implements AuthService {
             });
 
             // remove password before returning
-            // @ts-ignore
-            const { password, ...safe } = created;
-            return safe as User;
+            const { password: _p, ...safe } = created;
+            return safe as PublicUser;
         } catch (error: any) {
             console.error('Full error:', JSON.stringify(error, null, 2));
             console.error('Error code:', error.code);
@@ -46,7 +45,7 @@ export class PrismaAuthService implements AuthService {
         }
     }
 
-    async login(credential: Login): Promise<{ user: User; token: string }> {
+    async login(credential: Login): Promise<{ user: PublicUser; token: string }> {
         const { email, password } = credential;
         const user = await this.prisma.user.findUnique({
             where: { email } 
@@ -65,9 +64,8 @@ export class PrismaAuthService implements AuthService {
         const token = await this.tokenService.generateToken(user);
 
         // strip password from returned user
-        // @ts-ignore
         const { password: _p, ...safe } = user;
-        return { user: safe as User, token };
+        return { user: safe as PublicUser, token };
     }
 
     async logout(token: string): Promise<void> {

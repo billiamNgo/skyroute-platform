@@ -41,7 +41,8 @@ export default function SecurityMiddleware(tokenService: TokenService) {
   const isAdmin = checkRole("admin");
   const isTechnician = checkRole("technician");
   const isPharmacist = checkRole("pharmacist");
+  const isPharmacy = checkRole("pharmacy");
   const isCustomer = checkRole("customer");
 
-  return { authenticateJWT, isAdmin, isTechnician, isPharmacist, isCustomer };
+  return { authenticateJWT, isAdmin, isTechnician, isPharmacist, isPharmacy, isCustomer };
 }
