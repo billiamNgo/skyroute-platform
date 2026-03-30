@@ -23,9 +23,16 @@ export class PrismaAuthService implements AuthService {
             // hash the password before saving
             const hashed = await bcrypt.hash(userData.password, 10);
 
-            const created = await this.prisma.user.create({
-                data: {
+            const created = await this.prisma.user.upsert({
+                where: { email: userData.email },
+                create: {
                     email: userData.email,
+                    firstName: userData.firstName,
+                    lastName: userData.lastName,
+                    password: hashed,
+                    role: userData.role,
+                },
+                update: {
                     firstName: userData.firstName,
                     lastName: userData.lastName,
                     password: hashed,
