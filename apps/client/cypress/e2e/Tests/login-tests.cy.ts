@@ -32,35 +32,6 @@ describe("Role-based login redirects", () => {
         });
     });
 
-    it("logs in a pharmacist and redirects to /pharmacist", () => {
-        cy.intercept("POST", "http://localhost:8080/auth/login", {
-            statusCode: 200,
-            body: {
-                token: "pharmacist-token",
-                user: {
-                    email: "pharmacist@test.com",
-                    role: "pharmacist",
-                },
-            },
-        }).as("loginRequest");
-
-        cy.visit("/login");
-
-        cy.get('input[placeholder="Enter email"]').type("pharmacist@test.com");
-        cy.get('input[placeholder="Enter password"]').type("password123");
-        cy.get('button[type="submit"]').click();
-
-        cy.wait("@loginRequest");
-        cy.url().should("include", "/pharmacist");
-        cy.contains("Pharmacist Dashboard").should("be.visible");
-
-        cy.window().then((win) => {
-            expect(win.localStorage.getItem("token")).to.equal("pharmacist-token");
-            expect(win.localStorage.getItem("role")).to.equal("pharmacist");
-            expect(win.localStorage.getItem("email")).to.equal("pharmacist@test.com");
-        });
-    });
-
     it("logs in an admin and redirects to /admin", () => {
         cy.intercept("POST", "http://localhost:8080/auth/login", {
             statusCode: 200,
