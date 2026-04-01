@@ -27,6 +27,7 @@ If you want to add to the prisma schema rebuild the containter.
 
 ## Tests
 
+### Backend Tests
 To test the server-side code, run this command:
 ```
 cd apps/server
@@ -34,6 +35,18 @@ npx prisma generate
 npm test
 ```
 This will run the code using the testing environment.
+
+### End-to-End Tests
+To start Cypress to run end-to-end tests
+
+Start the server first (Refer to the 'Developing' section)
+
+In another terminal run these commands:
+```
+cd apps/client 
+npm install
+npx cypress open
+```
 
 ## Environment file
 Create a .env file in the ./apps/server directory
