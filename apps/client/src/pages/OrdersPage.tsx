@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../utils/auth";
 import OrdersList from "../components/OrdersList";
@@ -18,7 +18,10 @@ type Order = {
 
 export default function OrdersPage() { 
     const navigate = useNavigate(); 
+    const [orders, setOrders] = useState<Order[]>([]);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const handleLogout = async () => { 
         await logoutUser();
@@ -34,38 +37,47 @@ export default function OrdersPage() {
         alert(`Cancelling order ${selectedOrder.id}`);
     };
 
-    const orders: Order[] = [ 
-        { 
-            id: "ORD-001",
-            customerName: "John Doe",
-            address: "123 Main St",
-            distance: "2.4 miles",
-            status: "Pending",
-            packageWeight: "2.1 oz",
-            medication: "Amoxicillian 500mg",
-            eta: "18 minutes",
-        },
-        {
-            id: "ORD-002",
-            customerName: "Jane Adams",
-            address: "405 Oak Ave",
-            distance: "4.1 miles",
-            status: "Assigned",
-            packageWeight: "1.4 oz",
-            medication: "Insulin",
-            eta: "25 minutes",
-        },
-        {
-            id: "ORD-003",
-            customerName: "Patrick Smith",
-            address: "307 Bear Ln",
-            distance: "1.8 miles",
-            status: "In-Transit",
-            packageWeight: "0.9 oz",
-            medication: "Blood Pressure Medication",
-            eta: "10 minutes",
-        },
-    ];
+    useEffect(() => {
+        const fetchOrders = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const res = await fetch("http://localhost:8080/orders", {
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+                const text = await res.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (parseErr) {
+                    console.error("Raw response from /orders:", text);
+                    throw new Error("Failed to parse response from server. See console for details.");
+                }
+                if (!Array.isArray(data)) {
+                    throw new Error("API did not return an array of orders");
+                }
+                const mappedOrders = data.map((order: any) => ({
+                    id: order.orderID?.toString() || order.id,
+                    customerName: order.customerFirstName && order.customerLastName ? `${order.customerFirstName} ${order.customerLastName}` : order.customerName || "N/A",
+                    address: order.address || "N/A",
+                    distance: order.distance || "N/A",
+                    status: order.status,
+                    packageWeight: order.packageWeight || order.package_weight || "N/A",
+                    medication: order.medicationName || order.medication || "N/A",
+                    eta: order.eta || "N/A",
+                }));
+                setOrders(mappedOrders);
+            } catch (err: any) {
+                setError(err.message || "Unknown error");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchOrders();
+    }, []);
 
     return (
         <div className="dashboard-page">
@@ -110,11 +122,17 @@ export default function OrdersPage() {
                 <div className="orders-layout">
                     <div className="orders-list-panel">
                         <h2 className="orders-section-title">Select an Order:</h2>
-                        <OrdersList 
-                        orders={orders} 
-                        onSelect={setSelectedOrder}
-                        selectedOrderId={selectedOrder?.id}
-                        />
+                        {loading ? (
+                            <div>Loading orders...</div>
+                        ) : error ? (
+                            <div style={{ color: "red" }}>{error}</div>
+                        ) : (
+                            <OrdersList 
+                                orders={orders} 
+                                onSelect={setSelectedOrder}
+                                selectedOrderId={selectedOrder?.id}
+                            />
+                        )}
                     </div>
 
                     <div className="orders-details-panel">

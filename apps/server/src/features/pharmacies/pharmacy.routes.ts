@@ -12,7 +12,7 @@ export default function pharmacyRoutes(security: any) {
 
 	// Require JWT authentication and pharmacy role for creating new orders
 	router.post(
-		'/:pharmacyID/new-order',
+		'/new-order',
 		security.authenticateJWT,
         security.isPharmacy,
 		pharmacyController.ingestOrder

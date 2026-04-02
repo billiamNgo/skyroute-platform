@@ -6,6 +6,7 @@ import TokenService from './src/features/token/token.service';
 import SecurityMiddleware from './src/middleware/security.middleware';
 import authRoutes from './src/features/auth/auth.routes';
 import pharmacyRoutes from './src/features/pharmacies/pharmacy.routes';
+import orderRoutes from './src/features/orders/order.routes';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 8080;
@@ -26,6 +27,7 @@ app.use(express.json());
 // 4. Feature Routes
 app.use('/auth', authRoutes);
 app.use('/pharmacy', pharmacyRoutes(security));
+app.use('/orders', orderRoutes(security));
 
 // 5. Test route
 app.get('/', (req, res) => {

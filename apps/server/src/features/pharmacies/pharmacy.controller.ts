@@ -6,7 +6,7 @@ export class PharmacyController {
 
     ingestOrder = async (req: Request, res: Response) => {
         try {
-            const pharmacyID = Number(req.params.pharmacyID);
+            const pharmacyID = Number((req as any).user.pharmacyId);
             const orderData = req.body;
             const newOrder = await this.pharmacyService.ingestOrder(pharmacyID, orderData);
             return res.status(201).json(newOrder);
