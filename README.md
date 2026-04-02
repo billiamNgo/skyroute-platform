@@ -47,6 +47,8 @@ cd apps/client
 npm install
 npx cypress open
 ```
+Cypress has dependencies for running on Linux depending on your version if an error is encountered when trying to open Cypress refer to this
+https://docs.cypress.io/app/get-started/install-cypress#Linux-Prerequisites
 
 ## Environment file
 Create a .env file in the ./apps/server directory

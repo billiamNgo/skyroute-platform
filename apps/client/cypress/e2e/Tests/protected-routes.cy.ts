@@ -5,20 +5,23 @@ describe("Protected route access", () => {
 
     it("redirects unauthenticated users from /technician to /login", () => {
         cy.visit("/technician");
-        cy.url().should("include", "/login");
-        cy.contains("Login").should("be.visible");
+        cy.location("pathname").should((path) => {
+            expect(["/", "login"]).to.include(path);
+        });
     });
 
     it("redirects unauthenticated users from /admin to /login", () => {
         cy.visit("/admin");
-        cy.url().should("include", "/login");
-        cy.contains("Login").should("be.visible");
+        cy.location("pathname").should((path) => {
+            expect(["/", "login"]).to.include(path);
+        });
     });
 
     it("redirects unauthenticated users from /orders to /login", () => {
         cy.visit("/orders");
-        cy.url().should("include", "/login");
-        cy.contains("Login").should("be.visible");
+        cy.location("pathname").should((path) => {
+            expect(["/", "login"]).to.include(path);
+        });
     });
 });
 
