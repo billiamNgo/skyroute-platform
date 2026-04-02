@@ -6,7 +6,7 @@ export class OrderController {
 
     getAllOrders = async (req: Request, res: Response) => {
         try {
-            const pharmacyId = (req as any).user.pharmacyId; 
+            const pharmacyId = Number((req as any).user.pharmacyId);
             const status = req.query.status as any;
 
             const orders = await this.orderService.getOrdersByPharmacy(pharmacyId, status);

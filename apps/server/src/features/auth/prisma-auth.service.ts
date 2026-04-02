@@ -56,7 +56,7 @@ export class PrismaAuthService implements AuthService {
         const { email, password } = credential;
         const user = await this.prisma.user.findUnique({
             where: { email } 
-        });
+        }) as PrismaUser;
 
         if (!user) {
             throw new Error('Invalid credentials');
@@ -68,7 +68,16 @@ export class PrismaAuthService implements AuthService {
             throw new Error('Invalid credentials');
         }
 
-        const token = await this.tokenService.generateToken(user);
+        const jwtPayload = {
+            userID: user.userID,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            role: user.role,
+            pharmacyId: user.pharmacyID
+        };
+
+        const token = await this.tokenService.generateToken(jwtPayload);
 
         // strip password from returned user
         const { password: _p, ...safe } = user;
