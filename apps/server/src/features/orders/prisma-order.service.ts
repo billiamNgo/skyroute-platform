@@ -37,12 +37,13 @@ export class PrismaOrderService implements OrderService {
         }) as Order[];
     }
 
-    async getOrderById(orderId: number): Promise<Order | null> {
+    async getOrderById(orderId: number, userPharmacyId: number): Promise<Order | null> {
         // Validate OrderID is present and a positive integer
         if (isNaN(orderId) || orderId <= 0) {
             throw createError(400, 'Invalid order ID');
         }
 
+        // Validate Order Exists & Grab Order Details
         const order = await this.prisma.orders.findUnique({
             where: { orderID: orderId }
         }) as Order | null;
@@ -50,6 +51,12 @@ export class PrismaOrderService implements OrderService {
         if (!order) {
             throw createError(404, `Order ${orderId} not found`);
         }
+
+        // Permission check
+        if (order.pharmacyID !== userPharmacyId) {
+            throw createError(403, 'Forbidden: You do not have access to this order');
+        }
+
         return order;
     }
 

@@ -18,7 +18,7 @@ export class OrderController {
 
     getOrder = async (req: Request, res: Response) => {
         try {
-            const order = await this.orderService.getOrderById(Number(req.params.id));
+            const order = await this.orderService.getOrderById(Number(req.params.id), Number((req as any).user.pharmacyId));
             return res.json(order);
         } catch (error: any) {
             return res.status(error.status || 500).json({ message: error.message || 'Internal server error' });
