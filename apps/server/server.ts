@@ -27,7 +27,8 @@ app.use(express.json());
 // 4. Feature Routes
 app.use('/auth', authRoutes);
 app.use('/pharmacy', pharmacyRoutes(security));
-app.use('/orders', orderRoutes);
+app.use('/orders', orderRoutes(security));
+
 // 5. Test route
 app.get('/', (req, res) => {
   res.send('All is well! Connected to the server!');
