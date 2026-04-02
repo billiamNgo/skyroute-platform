@@ -15,7 +15,7 @@ export default function ProtectedRoute({
     const role = getRole(); 
 
     if (!token || role !== allowedRole) { 
-        return <Navigate to="/login" replace />
+        return <Navigate to="/" replace />
     }
 
     return component;

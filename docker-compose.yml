@@ -12,7 +12,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: sh -c "npx prisma migrate dev --name init && npm start"
+    command: sh -c "npx prisma migrate dev --name init && npx prisma db seed && npm start"
 
   client:
     build:
