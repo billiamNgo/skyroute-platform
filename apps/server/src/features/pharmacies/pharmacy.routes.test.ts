@@ -63,14 +63,14 @@ describe('Pharmacy Routes', () => {
     app.use('/pharmacy', (pharmacyRoutes as any)(makeSecurity()));
   });
 
-  it('POST /pharmacy/:pharmacyID/new-order without token returns 401', async () => {
-    const res = await request(app).post('/pharmacy/1/new-order').send({});
+  it('POST /pharmacy/new-order without token returns 401', async () => {
+    const res = await request(app).post('/pharmacy/new-order').send({});
     expect(res.status).toBe(401);
   });
 
-  it('POST /pharmacy/:pharmacyID/new-order with non-pharmacy token returns 403', async () => {
+  it('POST /pharmacy/new-order with non-pharmacy token returns 403', async () => {
     const res = await request(app)
-      .post('/pharmacy/1/new-order')
+      .post('/pharmacy/new-order')
       .set('Authorization', 'Bearer validtoken')
       .send({});
 
@@ -78,9 +78,9 @@ describe('Pharmacy Routes', () => {
     expect(res.body).toHaveProperty('message', 'This action is for pharmacies only');
   });
 
-  it('POST /pharmacy/:pharmacyID/new-order with pharmacist token returns 403', async () => {
+  it('POST /pharmacy/new-order with pharmacist token returns 403', async () => {
     const res = await request(app)
-      .post('/pharmacy/1/new-order')
+      .post('/pharmacy/new-order')
       .set('Authorization', 'Bearer pharmacisttoken')
       .send({});
 
@@ -88,9 +88,9 @@ describe('Pharmacy Routes', () => {
     expect(res.body).toHaveProperty('message', 'This action is for pharmacies only');
   });
 
-  it('POST /pharmacy/:pharmacyID/new-order with pharmacy token returns 201', async () => {
+  it('POST /pharmacy/new-order with pharmacy token returns 201', async () => {
     const res = await request(app)
-      .post('/pharmacy/1/new-order')
+      .post('/pharmacy/new-order')
       .set('Authorization', 'Bearer pharmacytoken')
       .send({});
 
