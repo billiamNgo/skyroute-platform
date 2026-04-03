@@ -30,7 +30,7 @@ describe('Auth Routes', () => {
             firstName: 'fake',
             lastName: 'account',
             password: 'testPassword123',
-            role: 'customer'
+            role: 'technician'
         });
 
         expect(res.status).toBe(201);
