@@ -81,3 +81,7 @@ Development Checkpoint 1 Demo Video:
 ```
 https://www.loom.com/share/33586033103142e0b117cd95e669bae1
 ```
+Development Checkpoint 2 Demo Video:
+```
+https://drive.google.com/file/d/1BTRljRbTGgiH9rrAVyBe-ALypK0dl1Em/view?usp=sharing
+```
