@@ -2,6 +2,6 @@ import { Drone, DroneLocation } from '@shared/drone.model';
 
 export interface DroneService {
     getDronesByPharmacy(pharmacyId: number): Promise<Drone[]>;
-    getDroneTrackingData(droneId: number): Promise<{ drone: Drone; lastLocation: DroneLocation | null }>;
+    getDroneTrackingData(droneId: number, pharmacyId: number): Promise<{ drone: Drone; lastLocation: DroneLocation | null }>;
     updateDroneStatus(droneId: number, status: string): Promise<Drone>;
 }

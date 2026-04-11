@@ -21,7 +21,7 @@ export class PrismaDroneService implements DroneService {
         }) as Drone[];
     }
 
-    async getDroneTrackingData(droneId: number): Promise<{ drone: Drone; lastLocation: DroneLocation | null }> {
+    async getDroneTrackingData(droneId: number, pharmacyId: number): Promise<{ drone: Drone; lastLocation: DroneLocation | null }> {
         const drone = await this.prisma.drones.findUnique({
             where: { droneID: droneId },
             include: {
@@ -34,8 +34,12 @@ export class PrismaDroneService implements DroneService {
 
         if (!drone) {
             throw createError(404, `Drone ${droneId} not found`);
-        } 
-        
+        }
+        // Check drone belongs to pharmacy if pharmacyId provided
+        if (pharmacyId !== undefined && drone.pharmacyID !== pharmacyId) {
+            throw createError(403, 'Forbidden: Drone does not belong to your pharmacy');
+        }
+
         const { locations, ...droneData } = drone;
         return {
             drone: droneData as Drone,

@@ -17,7 +17,8 @@ export class DroneController {
     trackDrone = async (req: Request, res: Response) => {
         try {
             const droneId = Number(req.params.id);
-            const tracking = await this.droneService.getDroneTrackingData(droneId);
+            const pharmacyId = Number((req as any).user.pharmacyId);
+            const tracking = await this.droneService.getDroneTrackingData(droneId, pharmacyId);
             return res.json(tracking);
         } catch (error: any) {
             return res.status(error.status || 500).json({ message: error.message || 'Internal server error' });
