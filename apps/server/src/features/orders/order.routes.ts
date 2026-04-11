@@ -11,19 +11,19 @@ export default function orderRoutes(security: any) {
 
     router.get('/', 
         security.authenticateJWT,
-        security.isTechnician,
+        security.isStaff,
         controller.getAllOrders
     );
 
     router.get('/:id', 
         security.authenticateJWT,
-        security.isTechnician,
+        security.isStaff,
         controller.getOrder
     );
 
     router.post('/assign/:id', 
         security.authenticateJWT,
-        security.isTechnician,
+        security.isStaff,
         controller.assignOrder
     );
 
