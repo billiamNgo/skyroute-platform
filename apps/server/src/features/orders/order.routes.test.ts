@@ -12,7 +12,7 @@ describe('Order Routes Integration', () => {
             (req as any).user = { pharmacyId: 1 };
             next();
         }),
-        isTechnician: jest.fn((req, res, next) => next()),
+    isStaff: jest.fn((req, res, next) => next()),
     };
 
     beforeAll(() => {
@@ -29,7 +29,7 @@ describe('Order Routes Integration', () => {
         const response = await request(app).get('/orders');
         
         expect(mockSecurity.authenticateJWT).toHaveBeenCalled();
-        expect(mockSecurity.isTechnician).toHaveBeenCalled();
+        expect(mockSecurity.isStaff).toHaveBeenCalled();
         expect(response.status).toBe(200);
     });
 
@@ -40,7 +40,7 @@ describe('Order Routes Integration', () => {
             .post('/orders/assign/50')
             .send({ droneId: 99 });
 
-        expect(spy).toHaveBeenCalledWith(50, 99);
+        expect(spy).toHaveBeenCalledWith(50, 99, 1);
         expect(response.status).toBe(200);
     });
 });
