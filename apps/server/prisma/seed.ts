@@ -85,6 +85,101 @@ async function main() {
     console.log(`Ensured service account ${user.email} for pharmacy ${pharmacy.name}`);
   }
 
+  // Create drones and orders for each pharmacy
+  console.log('Seeding drones and orders...');
+  for (const p of pharmacies) {
+    const pharmacy = await prisma.pharmacies.findFirst({ where: { name: p.name } });
+    if (!pharmacy) continue;
+
+    // Create 3 drones for this pharmacy
+    for (let i = 1; i <= 3; i++) {
+      const drone = await prisma.drones.create({
+        data: {
+          pharmacyID: pharmacy.pharmacyID,
+          currentStatus: 'IDLE',
+          batteryLevel: 100 - (i * 10),
+        },
+      });
+      console.log(`Created drone ${drone.droneID} for ${pharmacy.name}`);
+    }
+
+    // Create 3 orders for this pharmacy
+    const orderData = [
+      {
+        firstName: 'John',
+        lastName: 'Smith',
+        address: '100 Main St',
+        medication: 'Aspirin',
+      },
+      {
+        firstName: 'Sarah',
+        lastName: 'Johnson',
+        address: '250 Oak Ave',
+        medication: 'Lisinopril',
+      },
+      {
+        firstName: 'Michael',
+        lastName: 'Williams',
+        address: '500 Pine Rd',
+        medication: 'Atorvastatin',
+      },
+      {
+        firstName: 'Emily',
+        lastName: 'Brown',
+        address: '150 Elm St',
+        medication: 'Metformin',
+      },
+      {
+        firstName: 'David',
+        lastName: 'Miller',
+        address: '350 Maple Dr',
+        medication: 'Amoxicillin',
+      },
+      {
+        firstName: 'Jessica',
+        lastName: 'Davis',
+        address: '450 Cedar Ln',
+        medication: 'Ibuprofen',
+      },
+      {
+        firstName: 'James',
+        lastName: 'Garcia',
+        address: '200 Birch Ct',
+        medication: 'Omeprazole',
+      },
+      {
+        firstName: 'Amanda',
+        lastName: 'Martinez',
+        address: '600 Spruce Way',
+        medication: 'Metoprolol',
+      },
+      {
+        firstName: 'Christopher',
+        lastName: 'Rodriguez',
+        address: '800 Willow Pl',
+        medication: 'Sertraline',
+      },
+    ];
+
+    for (let i = 0; i < 3; i++) {
+      const data = orderData[orderData.length - (3 - i) + (pharmacies.indexOf(p) * 3)];
+      const order = await prisma.orders.create({
+        data: {
+          pharmacyID: pharmacy.pharmacyID,
+          customerFirstName: data.firstName,
+          customerLastName: data.lastName,
+          address: data.address,
+          city: p.city,
+          state: p.state,
+          zip: p.zip,
+          status: 'PENDING',
+          medicationName: data.medication,
+        },
+      });
+      console.log(`Created order ${order.orderID} for ${pharmacy.name}`);
+    }
+  }
+
   console.log('Seeding complete.');
 }
 
