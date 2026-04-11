@@ -51,10 +51,14 @@ describe('OrderController', () => {
 
     describe('assignOrder', () => {
         it('should call assignDrone with correct params', async () => {
-            req = { params: { id: '10' }, body: { droneId: 5 } } as any;
+            req = { 
+                params: { id: '10' }, 
+                body: { droneId: 5 },
+                user: { pharmacyId: 1 }
+            } as any;
             await controller.assignOrder(req as Request, res as Response);
-
-            expect(mockService.assignDrone).toHaveBeenCalledWith(10, 5);
+            
+            expect(mockService.assignDrone).toHaveBeenCalledWith(10, 5, 1);
         });
     });
 });

@@ -7,6 +7,7 @@ import SecurityMiddleware from './src/middleware/security.middleware';
 import authRoutes from './src/features/auth/auth.routes';
 import pharmacyRoutes from './src/features/pharmacies/pharmacy.routes';
 import orderRoutes from './src/features/orders/order.routes';
+import droneRoutes from './src/features/drones/drone.routes';
 
 const app = express();
 const PORT = Number(process.env.PORT) || 8080;
@@ -28,6 +29,7 @@ app.use(express.json());
 app.use('/auth', authRoutes);
 app.use('/pharmacy', pharmacyRoutes(security));
 app.use('/orders', orderRoutes(security));
+app.use('/drones', droneRoutes(security));
 
 // 5. Test route
 app.get('/', (req, res) => {

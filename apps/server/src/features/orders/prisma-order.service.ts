@@ -60,27 +60,33 @@ export class PrismaOrderService implements OrderService {
         return order;
     }
 
-    async assignDrone(orderId: number, droneId: number): Promise<Order> {
-        // Validate OrderID and DroneID are present and positive integers
+    async assignDrone(orderId: number, droneId: number, pharmacyId?: number): Promise<Order> {
+        // Validate OrderID, DroneID, and PharmacyID are present and positive integers
         if (isNaN(orderId) || orderId <= 0) {
             throw createError(400, 'Invalid order ID');
         }
         if (isNaN(droneId) || droneId <= 0) {
             throw createError(400, 'Invalid drone ID');
         }
+        if (pharmacyId !== undefined && (isNaN(pharmacyId) || pharmacyId <= 0)) {
+            throw createError(400, 'Invalid pharmacy ID');
+        }
 
-        // Validate Order Exists & is pending
+        // Validate Order exists, is pending, and belongs to pharmacy
         const order = await this.prisma.orders.findUnique({
-            where: ({ orderID: orderId })
-        })
+            where: { orderID: orderId }
+        });
         if (!order) {
             throw createError(404, `Order ${orderId} not found`);
         }
         if (order.status !== OrderStatus.PENDING) {
             throw createError(400, `Order is already ${order.status}`);
         }
+        if (pharmacyId !== undefined && order.pharmacyID !== pharmacyId) {
+            throw createError(403, 'Forbidden: Order does not belong to your pharmacy');
+        }
 
-        // Validate Drone Exists & is available
+        // Validate Drone exists, is available, and belongs to pharmacy
         const drone = await this.prisma.drones.findUnique({
             where: { droneID: droneId }
         });
@@ -89,6 +95,9 @@ export class PrismaOrderService implements OrderService {
         }
         if (drone.currentStatus !== 'IDLE') {
             throw createError(400, `Drone ${droneId} is currently ${drone.currentStatus}`);
+        }
+        if (pharmacyId !== undefined && drone.pharmacyID !== pharmacyId) {
+            throw createError(403, 'Forbidden: Drone does not belong to your pharmacy');
         }
 
         // Update drone status to IN_TRANSIT

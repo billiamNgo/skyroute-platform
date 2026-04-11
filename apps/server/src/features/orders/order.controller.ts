@@ -28,7 +28,8 @@ export class OrderController {
     assignOrder = async (req: Request, res: Response) => {
         try {
             const { droneId } = req.body;
-            const updatedOrder = await this.orderService.assignDrone(Number(req.params.id), droneId);
+            const pharmacyId = Number((req as any).user.pharmacyId);
+            const updatedOrder = await this.orderService.assignDrone(Number(req.params.id), droneId, pharmacyId);
             return res.json(updatedOrder);
         } catch (error: any) {
             return res.status(error.status || 500).json({ message: error.message || 'Internal server error' });

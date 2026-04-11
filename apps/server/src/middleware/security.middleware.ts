@@ -44,5 +44,13 @@ export default function SecurityMiddleware(tokenService: TokenService) {
   const isPharmacy = checkRole("pharmacy");
   const isCustomer = checkRole("customer");
 
-  return { authenticateJWT, isAdmin, isTechnician, isPharmacist, isPharmacy, isCustomer };
+  const isStaff = (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) return res.sendStatus(401);
+    if (req.user.role === "technician" || req.user.role === "pharmacist") {
+      return next();
+    }
+    return res.status(403).json({ status: "fail", message: "Restricted to Staff only" });
+  };
+
+  return { authenticateJWT, isAdmin, isTechnician, isPharmacist, isPharmacy, isCustomer, isStaff };
 }
