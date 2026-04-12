@@ -161,8 +161,11 @@ async function main() {
       },
     ];
 
-    for (let i = 0; i < 3; i++) {
-      const data = orderData[orderData.length - (3 - i) + (pharmacies.indexOf(p) * 3)];
+    // Assign 3 unique orders per pharmacy
+    const startIdx = pharmacies.indexOf(p) * 3;
+    const ordersForPharmacy = orderData.slice(startIdx, startIdx + 3);
+    for (const data of ordersForPharmacy) {
+      if (!data) continue;
       const order = await prisma.orders.create({
         data: {
           pharmacyID: pharmacy.pharmacyID,
