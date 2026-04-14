@@ -22,6 +22,7 @@ export default function OrdersPage() {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showAssignDroneModal, setShowAssignDroneModal] = useState(false);
 
     const handleLogout = async () => { 
         await logoutUser();
@@ -29,7 +30,7 @@ export default function OrdersPage() {
 
     const handleAssignDrone = () => { 
         if (!selectedOrder) return;
-        alert(`Assigning drone to order ${selectedOrder.id}`);
+        setShowAssignDroneModal(true);
     };
 
     const handleCancelOrder = () => { 
@@ -41,6 +42,7 @@ export default function OrdersPage() {
         const fetchOrders = async () => {
             setLoading(true);
             setError(null);
+
             try {
                 const res = await fetch("http://localhost:8080/orders", {
                     headers: {
@@ -48,17 +50,21 @@ export default function OrdersPage() {
                         "Content-Type": "application/json"
                     }
                 });
+
                 const text = await res.text();
                 let data;
+
                 try {
                     data = JSON.parse(text);
                 } catch (parseErr) {
                     console.error("Raw response from /orders:", text);
                     throw new Error("Failed to parse response from server. See console for details.");
                 }
+
                 if (!Array.isArray(data)) {
                     throw new Error("API did not return an array of orders");
                 }
+
                 const mappedOrders = data.map((order: any) => ({
                     id: order.orderID?.toString() || order.id,
                     customerName: order.customerFirstName && order.customerLastName ? `${order.customerFirstName} ${order.customerLastName}` : order.customerName || "N/A",
@@ -69,6 +75,7 @@ export default function OrdersPage() {
                     medication: order.medicationName || order.medication || "N/A",
                     eta: order.eta || "N/A",
                 }));
+
                 setOrders(mappedOrders);
             } catch (err: any) {
                 setError(err.message || "Unknown error");
@@ -76,6 +83,7 @@ export default function OrdersPage() {
                 setLoading(false);
             }
         };
+
         fetchOrders();
     }, []);
 
@@ -122,6 +130,7 @@ export default function OrdersPage() {
                 <div className="orders-layout">
                     <div className="orders-list-panel">
                         <h2 className="orders-section-title">Select an Order:</h2>
+
                         {loading ? (
                             <div>Loading orders...</div>
                         ) : error ? (
@@ -167,10 +176,10 @@ export default function OrdersPage() {
                         </div>
 
                     ) : ( 
-                    <div className="order-details-placeholder">
-                        Select an order to view details
-                    </div>
-                )}
+                        <div className="order-details-placeholder">
+                            Select an order to view details
+                        </div>
+                    )}
 
                     <div className="orders-action-group">
                         <button 
@@ -189,9 +198,39 @@ export default function OrdersPage() {
                             Cancel Order
                         </button>
                     </div>
+
+                    {showAssignDroneModal && selectedOrder && (
+                        <div className="modal-overlay">
+                            <div className="modal-content">
+                                <h2>Assign Drone</h2>
+                                <p>
+                                    Assign a drone to an order <strong>{selectedOrder.id}</strong>?
+                                </p>
+
+                                <div className="modal-actions">
+                                    <button
+                                        className="orders-action-button orders-primary-button"
+                                        onClick={() => { 
+                                            alert(`Drone assigned to order ${selectedOrder.id}`);
+                                            setShowAssignDroneModal(false);
+                                        }}
+                                    >
+                                        Confirm
+                                    </button>
+
+                                    <button
+                                        className="orders-action-button dashboard-danger-button"
+                                        onClick={() => setShowAssignDroneModal(false)}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>     
                 </div>
             </div>
         </div>
-    </div>
-  );
+    );
 }
