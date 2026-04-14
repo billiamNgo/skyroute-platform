@@ -27,9 +27,10 @@ export class PrismaUserService implements UserService {
             dataToUpdate.password = await bcrypt.hash(updateData.password, 10);
         }
 
-        // Prevent manual pharmacy assignment through profile update
+        // Prevent manual pharmacy assignment or role escalation through profile update
         delete dataToUpdate.pharmacyID;
         delete dataToUpdate.userID;
+        delete dataToUpdate.role;
 
         const updated = await this.prisma.user.update({
             where: { userID: userId },
