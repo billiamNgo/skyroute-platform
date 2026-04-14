@@ -14,6 +14,7 @@ type Order = {
     packageWeight: string;
     medication: string;
     eta: string;
+    assignedDroneId?: string;
 };
 
 export default function OrdersPage() { 
@@ -48,14 +49,61 @@ export default function OrdersPage() {
         try { 
             setAssigning(true);
 
-            await new Promise((resolve) => setTimeout(resolve, 800));
+            const res = await fetch(
+                `http://localhost:8080/orders/assign/${selectedOrder.id}`,
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        droneId: Number(selectedDroneId),
+                    }),
+                }
+            );
 
-            alert(`Assigned drone ${selectedDroneId} to order ${selectedOrder.id}`);
+            const updatedOrder = await res.json();
+
+            if (!res.ok) { 
+                throw new Error(updatedOrder.message || "Failed to assign drone.");
+            }
+
+            setOrders((prev) =>
+                prev.map((order) =>
+                    order.id === selectedOrder.id
+                        ? {
+                            ...order,
+                            status: updatedOrder.status || "Assigned",
+                            assignedDroneId: String(
+                                updatedOrder.droneID ??
+                                    updatedOrder.assignedDroneId ??
+                                    selectedDroneId
+                            ),
+                        }
+                        : order
+                )
+            );
+
+            setSelectedOrder((prev) =>
+                prev
+                    ? { 
+                        ...prev,
+                        status: updatedOrder.status || "Assigned",
+                        assignedDroneId: String(
+                            updatedOrder.droneID ??
+                                updatedOrder.assignedDroneId ??
+                                selectedDroneId
+                        ),
+                    }
+                : prev
+            );
+
             setShowAssignDroneModal(false);
             setSelectedDroneId("");
-        } catch (err) { 
+        } catch (err: any) { 
             console.error("Error assigning drone:", err);
-            alert("Failed to assign drone.");
+            alert(err.message || "Failed to assign drone.");
         } finally { 
             setAssigning(false);
         }
@@ -90,13 +138,20 @@ export default function OrdersPage() {
 
                 const mappedOrders = data.map((order: any) => ({
                     id: order.orderID?.toString() || order.id,
-                    customerName: order.customerFirstName && order.customerLastName ? `${order.customerFirstName} ${order.customerLastName}` : order.customerName || "N/A",
+                    customerName: 
+                        order.customerFirstName && order.customerLastName 
+                        ? `${order.customerFirstName} ${order.customerLastName}` 
+                        : order.customerName || "N/A",
                     address: order.address || "N/A",
                     distance: order.distance || "N/A",
                     status: order.status,
                     packageWeight: order.packageWeight || order.package_weight || "N/A",
                     medication: order.medicationName || order.medication || "N/A",
                     eta: order.eta || "N/A",
+                    assignedDroneId:
+                        order.droneID?.toString() ||
+                        order.assignedDroneId?.toString() ||
+                        undefined,
                 }));
 
                 setOrders(mappedOrders);
@@ -236,6 +291,11 @@ export default function OrdersPage() {
                                 </p>
                                 <p>
                                     <strong>ETA:</strong> {selectedOrder.eta}
+                                </p>
+
+                                <p>
+                                    <strong>Assigned Drone:</strong>{" "}
+                                    {selectedOrder.assignedDroneId || "None"}
                                 </p>
                             </div>
 
