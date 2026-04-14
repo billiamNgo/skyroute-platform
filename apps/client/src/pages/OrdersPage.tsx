@@ -94,7 +94,7 @@ export default function OrdersPage() {
                         <button className="orders-tab active-tab">Orders</button>
                         <button
                             className="orders-tab"
-                            onClick={() => navigate("/technician")}
+                            onClick={() => navigate("/fleet")}
                         >
                             Drones
                         </button>
