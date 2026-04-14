@@ -25,6 +25,7 @@ export default function OrdersPage() {
     const [showAssignDroneModal, setShowAssignDroneModal] = useState(false);
     const [drones, setDrones] = useState<{ droneID: number; currentStatus: string }[]>([]);
     const [selectedDroneId, setSelectedDroneId] = useState("");
+    const [assigning, setAssigning] = useState(false);
 
     const handleLogout = async () => { 
         await logoutUser();
@@ -39,6 +40,25 @@ export default function OrdersPage() {
     const handleCancelOrder = () => { 
         if (!selectedOrder) return;
         alert(`Cancelling order ${selectedOrder.id}`);
+    };
+
+    const handleConfirmAssignDrone = async () => { 
+        if (!selectedOrder || !selectedDroneId || assigning) return;
+
+        try { 
+            setAssigning(true);
+
+            await new Promise((resolve) => setTimeout(resolve, 800));
+
+            alert(`Assigned drone ${selectedDroneId} to order ${selectedOrder.id}`);
+            setShowAssignDroneModal(false);
+            setSelectedDroneId("");
+        } catch (err) { 
+            console.error("Error assigning drone:", err);
+            alert("Failed to assign drone.");
+        } finally { 
+            setAssigning(false);
+        }
     };
 
     useEffect(() => {
@@ -274,20 +294,17 @@ export default function OrdersPage() {
                                     <div className="modal-actions">
                                         <button
                                             className="orders-action-button orders-primary-button"
-                                            disabled={!selectedDroneId}
-                                            onClick={() => { 
-                                                alert(`Assigned drone ${selectedDroneId} to order ${selectedOrder.id}`);
-                                                setShowAssignDroneModal(false);
-                                                setSelectedDroneId("");
-                                            }}
+                                            disabled={!selectedDroneId || assigning}
+                                            onClick={handleConfirmAssignDrone}
                                         >
-                                            Confirm
+                                            {assigning ? "Assigning..." : "Confirm"}
                                         </button>
 
                                         <button
                                             className="orders-action-button dashboard-danger-button"
+                                            disabled={assigning}
                                             onClick={() => {
-                                                setShowAssignDroneModal(false)
+                                                setShowAssignDroneModal(false);
                                                 setSelectedDroneId("");
                                             }}
                                         >
