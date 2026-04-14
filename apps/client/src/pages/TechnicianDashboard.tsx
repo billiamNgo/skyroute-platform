@@ -23,6 +23,13 @@ export default function TechnicianDashboard() {
             View Orders
           </button>
 
+          <button
+            className="orders-tab"
+            onClick={() => navigate("/fleet")}
+          >
+            Manage Drones
+          </button>
+          
           <button 
             className="dashboard-danger-button" 
             onClick={handleLogout}
