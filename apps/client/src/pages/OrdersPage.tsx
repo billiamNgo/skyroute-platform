@@ -23,6 +23,8 @@ export default function OrdersPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showAssignDroneModal, setShowAssignDroneModal] = useState(false);
+    const [drones, setDrones] = useState<{ droneID: number; currentStatus: string }[]>([]);
+    const [selectedDroneId, setSelectedDroneId] = useState("");
 
     const handleLogout = async () => { 
         await logoutUser();
@@ -30,6 +32,7 @@ export default function OrdersPage() {
 
     const handleAssignDrone = () => { 
         if (!selectedOrder) return;
+        setSelectedDroneId("");
         setShowAssignDroneModal(true);
     };
 
@@ -87,6 +90,47 @@ export default function OrdersPage() {
         fetchOrders();
     }, []);
 
+    useEffect (() => { 
+        if (!showAssignDroneModal) return;
+
+        const fetchDrones = async () => { 
+            try { 
+                const res = await fetch("http://localhost:8080/drones", {
+                    headers: { 
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                const text = await res.text();
+                let data;
+
+                try { 
+                    data = JSON.parse(text);
+                } catch { 
+                    console.error("Raw response from /drones:", text);
+                    throw new Error("Failed to parse drones response.");
+                }
+
+                if (!Array.isArray(data)) { 
+                    throw new Error("API did not return an array of drones");
+                }
+
+                const mappedDrones = data.map((drone: any) => ({ 
+                    droneID: drone.droneID,
+                    currentStatus: drone.currentStatus || "Unknown",
+                }));
+
+                setDrones(mappedDrones);
+            } catch (err){ 
+                console.error("Error loading drones:", err);
+                setDrones([]);
+            }
+        };
+
+        fetchDrones();
+    }, [showAssignDroneModal]);
+
     return (
         <div className="dashboard-page">
             <div className="dashboard-container orders-page-container">
@@ -127,100 +171,125 @@ export default function OrdersPage() {
 
                     <h1 className="dashboard-title">Orders</h1>
 
-                <div className="orders-layout">
-                    <div className="orders-list-panel">
-                        <h2 className="orders-section-title">Select an Order:</h2>
+                    <div className="orders-layout">
+                        <div className="orders-list-panel">
+                            <h2 className="orders-section-title">Select an Order:</h2>
 
-                        {loading ? (
-                            <div>Loading orders...</div>
-                        ) : error ? (
-                            <div style={{ color: "red" }}>{error}</div>
-                        ) : (
-                            <OrdersList 
-                                orders={orders} 
-                                onSelect={setSelectedOrder}
-                                selectedOrderId={selectedOrder?.id}
-                            />
-                        )}
-                    </div>
-
-                    <div className="orders-details-panel">
-                        <h2 className="orders-section-title">Order Details:</h2>
-
-                    {selectedOrder ? ( 
-                        <div className="order-details-card">
-                            <p>
-                                <strong>Order ID:</strong> {selectedOrder.id}
-                            </p>
-                            <p>
-                                <strong>Customer:</strong> {selectedOrder.customerName}
-                            </p>
-                            <p>
-                                <strong>Address:</strong> {selectedOrder.address}
-                            </p>
-                            <p>
-                                <strong>Distance:</strong> {selectedOrder.distance}
-                            </p>
-                            <p>
-                                <strong>Status:</strong> {selectedOrder.status}
-                            </p>
-                            <p>
-                                <strong>Package Weight:</strong> {selectedOrder.packageWeight}
-                            </p>
-                            <p>
-                                <strong>Medication:</strong> {selectedOrder.medication}
-                            </p>
-                            <p>
-                                <strong>ETA:</strong> {selectedOrder.eta}
-                            </p>
+                            {loading ? (
+                                <div>Loading orders...</div>
+                            ) : error ? (
+                                <div style={{ color: "red" }}>{error}</div>
+                            ) : (
+                                <OrdersList 
+                                    orders={orders} 
+                                    onSelect={setSelectedOrder}
+                                    selectedOrderId={selectedOrder?.id}
+                                />
+                            )}
                         </div>
 
-                    ) : ( 
-                        <div className="order-details-placeholder">
-                            Select an order to view details
-                        </div>
-                    )}
+                        <div className="orders-details-panel">
+                            <h2 className="orders-section-title">Order Details:</h2>
 
-                    <div className="orders-action-group">
-                        <button 
-                            className="orders-action-button orders-primary-button"
-                            onClick={handleAssignDrone}
-                            disabled={!selectedOrder}
-                        >
-                            Assign Drone
-                        </button>
-
-                        <button 
-                            className="orders-action-button dashboard-danger-button"
-                            onClick={handleCancelOrder}
-                            disabled={!selectedOrder}
-                        >
-                            Cancel Order
-                        </button>
-                    </div>
-
-                    {showAssignDroneModal && selectedOrder && (
-                        <div className="modal-overlay">
-                            <div className="modal-content">
-                                <h2>Assign Drone</h2>
+                        {selectedOrder ? ( 
+                            <div className="order-details-card">
                                 <p>
-                                    Assign a drone to an order <strong>{selectedOrder.id}</strong>?
+                                    <strong>Order ID:</strong> {selectedOrder.id}
                                 </p>
+                                <p>
+                                    <strong>Customer:</strong> {selectedOrder.customerName}
+                                </p>
+                                <p>
+                                    <strong>Address:</strong> {selectedOrder.address}
+                                </p>
+                                <p>
+                                    <strong>Distance:</strong> {selectedOrder.distance}
+                                </p>
+                                <p>
+                                    <strong>Status:</strong> {selectedOrder.status}
+                                </p>
+                                <p>
+                                    <strong>Package Weight:</strong> {selectedOrder.packageWeight}
+                                </p>
+                                <p>
+                                    <strong>Medication:</strong> {selectedOrder.medication}
+                                </p>
+                                <p>
+                                    <strong>ETA:</strong> {selectedOrder.eta}
+                                </p>
+                            </div>
 
-                                <div className="modal-actions">
-                                    <button
-                                        className="orders-action-button orders-primary-button"
-                                        onClick={() => { 
-                                            alert(`Drone assigned to order ${selectedOrder.id}`);
-                                            setShowAssignDroneModal(false);
-                                        }}
-                                    >
-                                        Confirm
-                                    </button>
+                        ) : ( 
+                            <div className="order-details-placeholder">
+                                Select an order to view details
+                            </div>
+                        )}
 
-                                    <button
-                                        className="orders-action-button dashboard-danger-button"
-                                        onClick={() => setShowAssignDroneModal(false)}
+                        <div className="orders-action-group">
+                            <button 
+                                className="orders-action-button orders-primary-button"
+                                onClick={handleAssignDrone}
+                                disabled={!selectedOrder}
+                            >
+                                Assign Drone
+                            </button>
+
+                            <button 
+                                className="orders-action-button dashboard-danger-button"
+                                onClick={handleCancelOrder}
+                                disabled={!selectedOrder}
+                            >
+                                Cancel Order
+                            </button>
+                        </div>
+
+                        {showAssignDroneModal && selectedOrder && (
+                            <div className="modal-overlay">
+                                <div className="modal-content">
+                                    <h2>Assign Drone</h2>
+                                    <p>
+                                        Assign a drone to an order <strong>{selectedOrder.id}</strong>?
+                                    </p>
+
+                                    <div className="assign-drone-field">
+                                        <label htmlFor="drone-select" className="assign-drone-label">
+                                            Select Drone
+                                        </label>
+
+                                        <select
+                                            id="drone-select"
+                                            className="assign-drone-select"
+                                            value={selectedDroneId}
+                                            onChange={(e) => setSelectedDroneId(e.target.value)}
+                                        >
+                                            <option value="">Select a drone...</option>
+                                            {drones.map((drone) => ( 
+                                                <option key={drone.droneID} value={drone.droneID}>
+                                                    Drone {drone.droneID}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="modal-actions">
+                                        <button
+                                            className="orders-action-button orders-primary-button"
+                                            disabled={!selectedDroneId}
+                                            onClick={() => { 
+                                                alert(`Assigned drone ${selectedDroneId} to order ${selectedOrder.id}`);
+                                                setShowAssignDroneModal(false);
+                                                setSelectedDroneId("");
+                                            }}
+                                        >
+                                            Confirm
+                                        </button>
+
+                                        <button
+                                            className="orders-action-button dashboard-danger-button"
+                                            onClick={() => {
+                                                setShowAssignDroneModal(false)
+                                                setSelectedDroneId("");
+                                            }}
                                         >
                                             Cancel
                                         </button>
