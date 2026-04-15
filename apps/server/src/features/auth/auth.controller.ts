@@ -5,8 +5,18 @@ export class AuthController {
     constructor(private authService: AuthService) {}
     
     register = async (req: Request, res: Response) => {
-        const User = await this.authService.register(req.body);
-        res.status(201).json(User);
+        try {
+            const User = await this.authService.register(req.body);
+            res.status(201).json(User);
+        } catch (error: any) {
+            if (error.message === 'Account already exists') {
+                return res.status(409).json({ message: 'Account already exists' });
+            }
+
+            console.error('Registration error:', error);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
+
     }
 
     login = async (req: Request, res: Response) => {
