@@ -57,6 +57,14 @@ Create a .env file in the ./apps/server directory
 DATABASE_URL="postgresql://SkyRouteAdmin:SkyR0uteP@55w0rd@db:5432/SkyRoute"
 JWT_SECRET="asdf"
 JWT_EXPIRES_IN="1h"
+
+ADMIN_PASSWORD_PUBLIX="SecurePublixAdminPass!23"
+ADMIN_PASSWORD_CVS="SecureCVSAdminPass!23"
+ADMIN_PASSWORD_WALGREENS="SecureWalgreensAdminPass!23"
+
+SERVICE_PASSWORD_PUBLIX="SecurePublixServicePass!23"
+SERVICE_PASSWORD_CVS="SecureCVSServicePass!23"
+SERVICE_PASSWORD_WALGREENS="SecureWalgreensServicePass!23"
 ```
 
 
