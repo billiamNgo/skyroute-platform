@@ -25,9 +25,9 @@ export default function PharmacistDashboard() {
 
           <button
             className="orders-tab"
-            onClick={() => navigate("/pharmacist/orders")}
+            onClick={() => navigate("/pharmacist/drones")}
           >
-            Assign Drones
+            View Fleet
           </button>
 
           <button

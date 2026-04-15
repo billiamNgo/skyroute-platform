@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import TechnicianDashboard from "./pages/TechnicianDashboard";
 import PharmacistDashboard from "./pages/PharmacistDashboard";
+import PharmacistDronesPage from "./pages/PharmacistDronesPage";
 import PharmacistOrdersPage from "./pages/PharmacistOrdersPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import OrdersPage from "./pages/OrdersPage";
@@ -54,6 +55,16 @@ function App() {
             <ProtectedRoute 
               allowedRole="pharmacist"
               component={<PharmacistOrdersPage />}
+            />
+          }
+        />
+
+        <Route
+          path="/pharmacist/drones"
+          element={
+            <ProtectedRoute
+              allowedRole="pharmacist"
+              component={<PharmacistDronesPage />}
             />
           }
         />

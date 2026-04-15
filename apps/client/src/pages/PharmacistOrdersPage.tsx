@@ -220,10 +220,6 @@ export default function PharmacistOrdersPage() {
             Back
           </button>
 
-          <div className="orders-nav">
-            <button className="orders-tab active-tab">Orders</button>
-          </div>
-
           <button
             className="dashboard-danger-button"
             onClick={handleLogout}
@@ -233,6 +229,9 @@ export default function PharmacistOrdersPage() {
         </div>
 
         <h1 className="dashboard-title">Pharmacist Orders</h1>
+        <p className="dashboard-subtitle">
+            View current orders and select one to prepare for drone assignment.
+        </p>
 
         <div className="orders-layout">
           <div className="orders-list-panel">
