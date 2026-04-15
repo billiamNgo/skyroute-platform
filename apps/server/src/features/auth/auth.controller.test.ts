@@ -49,14 +49,14 @@ describe('AuthController', () => {
             expect(res.json).toHaveBeenCalledWith(userBody);
         });
 
-        it('propagates error when authService.register throws', async () => {
-            req = { body: userBody };
-            const error = new Error('Email already in use');
-            mockAuthService.register.mockRejectedValue(error);
+        it('returns 409 when account already exists', async () => {
+                const error = new Error('Account already exists');
+                mockAuthService.register.mockRejectedValue(error);
 
-            await expect(
-                authController.register(req as Request, res as Response)
-            ).rejects.toThrow('Email already in use');
+                await authController.register(req as Request, res as Response);
+
+                expect(res.status).toHaveBeenCalledWith(409);
+                expect(res.json).toHaveBeenCalledWith({ message: 'Account already exists' });
         });
     });
 
