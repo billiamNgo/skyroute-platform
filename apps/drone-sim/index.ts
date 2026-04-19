@@ -58,8 +58,8 @@ async function runMission(orderId: number) {
         lat += latStep;
         lon += lonStep;
 
-        // Wait 1 second between updates
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Wait 15 seconds between updates
+        await new Promise(resolve => setTimeout(resolve, 15000));
     }
 }
 
