@@ -54,15 +54,44 @@ async function main() {
       console.log(`Found existing pharmacy ${pharmacy.name} (id=${pharmacy.pharmacyID})`);
     }
 
+    // Create service account for this pharmacy
     const serviceName = `${p.name}-service`;
     const emailLocal = 'service@' + p.name.toLowerCase().replace(/\s+/g, '') + '.com';
 
+    // Create admin user for this pharmacy
+    const adminName = `${p.name}-admin`;
+    const adminEmail = 'admin@' + p.name.toLowerCase().replace(/\s+/g, '') + '.com';
+    const adminPasswordRaw = process.env[`ADMIN_PASSWORD_${p.name.toUpperCase().replace(/\W+/g, '_')}`] || process.env.ADMIN_PASSWORD || 'AdminPass!23';
+    const adminPasswordHashed = await bcrypt.hash(adminPasswordRaw, 10);
+
+    // Create or update admin user for this pharmacy
+    const adminUser = await prisma.user.upsert({
+      where: { email: adminEmail },
+      create: {
+        email: adminEmail,
+        firstName: adminName,
+        lastName: 'Admin',
+        password: adminPasswordHashed,
+        role: 'admin',
+        pharmacyID: pharmacy.pharmacyID,
+      },
+      update: {
+        firstName: adminName,
+        lastName: 'Admin',
+        password: adminPasswordHashed,
+        role: 'admin',
+        pharmacyID: pharmacy.pharmacyID,
+      },
+    });
+
+    console.log(`Ensured service account ${adminUser.email} for pharmacy ${pharmacy.name} with password ${adminPasswordRaw}`);
+
     // password resolution: per-pharmacy env var, then generic SERVICE_ACCOUNT_PASSWORD, then fallback
     const envKey = `SERVICE_PASSWORD_${p.name.toUpperCase().replace(/\W+/g, '_')}`;
-    const rawPassword = process.env[envKey] || process.env.SERVICE_ACCOUNT_PASSWORD || 'ChangeMe!23';
-    const hashed = await bcrypt.hash(rawPassword, 10);
+    const servicePasswordRaw = process.env[envKey] || process.env.SERVICE_ACCOUNT_PASSWORD || 'ChangeMe!23';
+    const hashed = await bcrypt.hash(servicePasswordRaw, 10);
 
-    const user = await prisma.user.upsert({
+    const serviceUser = await prisma.user.upsert({
       where: { email: emailLocal },
       create: {
         email: emailLocal,
@@ -82,7 +111,7 @@ async function main() {
       },
     });
 
-    console.log(`Ensured service account ${user.email} for pharmacy ${pharmacy.name}`);
+    console.log(`Ensured service account ${serviceUser.email} for pharmacy ${pharmacy.name} with password ${servicePasswordRaw}`);
   }
 
   // Create drones and orders for each pharmacy
