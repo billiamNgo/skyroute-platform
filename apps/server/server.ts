@@ -26,7 +26,7 @@ const tokenService = new TokenService(jwt, JWT_SECRET, JWT_EXPIRES_IN);
 const security = SecurityMiddleware(tokenService);
 
 // 3. Socket.io initialization
-const socketService = new SocketService(server);
+const socketService = new SocketService(server, tokenService);
 
 // 4. Global middleware
 app.use(cors({ origin: 'http://localhost:5173' }));

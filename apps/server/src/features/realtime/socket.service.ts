@@ -2,12 +2,13 @@ import { Server, Socket } from 'socket.io';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import http from 'http';
+import TokenService from '../token/token.service';
 
 export class SocketService {
     private io: Server;
     private prisma: PrismaClient;
 
-    constructor(server: http.Server) {
+    constructor(server: http.Server, private tokenService: TokenService) {
         this.io = new Server(server, {
             cors: {
                 origin: '*', // Adjust as needed for production
@@ -19,7 +20,37 @@ export class SocketService {
         const adapter = new PrismaPg({ connectionString });
         this.prisma = new PrismaClient({ adapter });
 
+        this.setupMiddleware();
         this.setupListeners();
+    }
+
+    private setupMiddleware() {
+        this.io.use(async (socket: Socket, next) => {
+            const token = socket.handshake.auth?.token;
+
+            if (!token) {
+                console.error(`Socket ${socket.id} rejected: No token provided`);
+                return next(new Error('Authentication error: No token provided'));
+            }
+
+            const decoded = await this.tokenService.verifyToken(token);
+            if (!decoded || !decoded.user) {
+                console.error(`Socket ${socket.id} rejected: Invalid token`);
+                return next(new Error('Authentication error: Invalid token'));
+            }
+
+            // Verify user has correct role (pharmacy or admin)
+            const role = decoded.user.role;
+            if (role !== 'pharmacy' && role !== 'admin' && role !== 'technician') {
+                console.error(`Socket ${socket.id} rejected: Insufficient permissions (${role})`);
+                return next(new Error('Authentication error: Insufficient permissions'));
+            }
+
+            // Attach user data to the socket for use in event listeners
+            (socket as any).user = decoded.user;
+            console.log(`Socket ${socket.id} authenticated as ${decoded.user.email} (Pharmacy: ${decoded.user.pharmacyId})`);
+            next();
+        });
     }
 
     private setupListeners() {
@@ -28,6 +59,13 @@ export class SocketService {
 
             // Room logic based on PharmacyID
             socket.on('join:pharmacy', (pharmacyId: number) => {
+                const authenticatedPharmacyId = (socket as any).user.pharmacyId;
+                
+                if (authenticatedPharmacyId && authenticatedPharmacyId !== pharmacyId) {
+                    console.error(`Socket ${socket.id} attempted to join unauthorized room: pharmacy_${pharmacyId}`);
+                    return; // Fail silently or emit error
+                }
+
                 const roomName = `pharmacy_${pharmacyId}`;
                 socket.join(roomName);
                 console.log(`Socket ${socket.id} joined room: ${roomName}`);
@@ -36,6 +74,12 @@ export class SocketService {
             // Handle Drone Telemetry
             socket.on('drone:telemetry', async (data: { droneId: number; latitude: number; longitude: number; pharmacyId: number }) => {
                 const { droneId, latitude, longitude, pharmacyId } = data;
+                const authenticatedPharmacyId = (socket as any).user.pharmacyId;
+
+                if (authenticatedPharmacyId && authenticatedPharmacyId !== pharmacyId) {
+                    console.error(`Socket ${socket.id} attempted to send telemetry for unauthorized pharmacy: ${pharmacyId}`);
+                    return;
+                }
                 
                 try {
                     // 1. Persistence Layer: Save to database
@@ -63,7 +107,18 @@ export class SocketService {
             // Handle Drone Status Updates (from simulator when finished)
             socket.on('drone:statusUpdate', async (data: { droneId: number; status: string }) => {
                 const { droneId, status } = data;
+                const authenticatedPharmacyId = (socket as any).user.pharmacyId;
+
                 try {
+                    // Verify drone belongs to the pharmacy
+                    if (authenticatedPharmacyId) {
+                        const drone = await this.prisma.drones.findUnique({ where: { droneID: droneId } });
+                        if (!drone || drone.pharmacyID !== authenticatedPharmacyId) {
+                            console.error(`Socket ${socket.id} attempted to update status for unauthorized drone: ${droneId}`);
+                            return;
+                        }
+                    }
+
                     await this.prisma.drones.update({
                         where: { droneID: droneId },
                         data: { currentStatus: status }
