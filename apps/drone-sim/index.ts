@@ -73,9 +73,10 @@ async function start() {
         console.log(`Mission complete: Order ${data.orderId} delivered.`);
         isBusy = false;
 
-        // Report status back to server as IDLE
+        // Report status back to server as IDLE and mission complete
         socket.emit('drone:statusUpdate', {
             droneId: DRONE_ID,
+            orderId: data.orderId,
             status: 'IDLE'
         });
     });

@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import http from 'http';
 import TokenService from '../token/token.service';
+import { OrderStatus } from '@shared/order.model';
 
 export class SocketService {
     private io: Server;
@@ -105,8 +106,8 @@ export class SocketService {
             });
 
             // Handle Drone Status Updates (from simulator when finished)
-            socket.on('drone:statusUpdate', async (data: { droneId: number; status: string }) => {
-                const { droneId, status } = data;
+            socket.on('drone:statusUpdate', async (data: { droneId: number; status: string; orderId?: number }) => {
+                const { droneId, status, orderId } = data;
                 const authenticatedPharmacyId = (socket as any).user.pharmacyId;
 
                 try {
@@ -119,10 +120,21 @@ export class SocketService {
                         }
                     }
 
+                    // 1. Update Drone Status
                     await this.prisma.drones.update({
                         where: { droneID: droneId },
                         data: { currentStatus: status }
                     });
+
+                    // 2. If mission complete, update Order Status
+                    if (status === 'IDLE' && orderId) {
+                        await this.prisma.orders.update({
+                            where: { orderID: orderId },
+                            data: { status: OrderStatus.DELIVERED }
+                        });
+                        console.log(`Order ${orderId} marked as DELIVERED by drone ${droneId}`);
+                    }
+
                     console.log(`Drone ${droneId} status updated to ${status}`);
                 } catch (error) {
                     console.error(`Error updating status for drone ${droneId}:`, error);
