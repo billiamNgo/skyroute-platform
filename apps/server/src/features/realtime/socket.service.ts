@@ -39,9 +39,9 @@ export class SocketService {
                 return next(new Error('Authentication error: Invalid token'));
             }
 
-            // Verify user has correct role (pharmacy or admin)
+            // Verify user has correct role (drone, pharmacy, or admin)
             const role = decoded.user.role;
-            if (role !== 'pharmacy' && role !== 'admin' && role !== 'technician') {
+            if (role !== 'drone' && role !== 'pharmacy' && role !== 'admin' && role !== 'technician') {
                 console.error(`Socket ${socket.id} rejected: Insufficient permissions (${role})`);
                 return next(new Error('Authentication error: Insufficient permissions'));
             }
