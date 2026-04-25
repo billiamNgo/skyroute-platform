@@ -20,19 +20,21 @@ export class PrismaAuthService implements AuthService {
     async register(userData: User): Promise<PublicUser> {
         console.log('Userdata received: ', userData);
         try {
+
+            const existingUser = await this.prisma.user.findUnique({
+                where: { email: userData.email }
+            });
+
+            if (existingUser) {
+                throw new Error('Account already exists');
+            }
+
             // hash the password before saving
             const hashed = await bcrypt.hash(userData.password, 10);
 
-            const created = await this.prisma.user.upsert({
-                where: { email: userData.email },
-                create: {
+            const created = await this.prisma.user.create({
+                data: {
                     email: userData.email,
-                    firstName: userData.firstName,
-                    lastName: userData.lastName,
-                    password: hashed,
-                    role: userData.role,
-                },
-                update: {
                     firstName: userData.firstName,
                     lastName: userData.lastName,
                     password: hashed,

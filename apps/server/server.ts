@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
+import http from 'http';
 import TokenService from './src/features/token/token.service';
 import SecurityMiddleware from './src/middleware/security.middleware';
 import authRoutes from './src/features/auth/auth.routes';
@@ -9,8 +10,10 @@ import pharmacyRoutes from './src/features/pharmacies/pharmacy.routes';
 import orderRoutes from './src/features/orders/order.routes';
 import droneRoutes from './src/features/drones/drone.routes';
 import userRoutes from './src/features/users/user.routes';
+import { SocketService } from './src/features/realtime/socket.service';
 
 const app = express();
+const server = http.createServer(app);
 const PORT = Number(process.env.PORT) || 8080;
 
 // 1. Environment variable checks
@@ -22,18 +25,21 @@ if (!JWT_SECRET) throw new Error('Missing JWT_SECRET environment variable');
 const tokenService = new TokenService(jwt, JWT_SECRET, JWT_EXPIRES_IN);
 const security = SecurityMiddleware(tokenService);
 
-// 3. Global middleware
+// 3. Socket.io initialization
+const socketService = new SocketService(server, tokenService);
+
+// 4. Global middleware
 app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 
-// 4. Feature Routes
+// 5. Feature Routes
 app.use('/auth', authRoutes);
 app.use('/pharmacy', pharmacyRoutes(security));
-app.use('/orders', orderRoutes(security));
+app.use('/orders', orderRoutes(security, socketService)); // Passing socketService to orders
 app.use('/drones', droneRoutes(security));
 app.use('/users', userRoutes(security));
 
-// 5. Test route
+// 6. Test route
 app.get('/', (req, res) => {
   res.send('All is well! Connected to the server!');
 });
@@ -42,9 +48,10 @@ app.get('/protected', security.authenticateJWT, (req, res) => {
   res.json({ ok: true, user: (req as any).user });
 });
 
-// 6. Spin up the server
+// 7. Spin up the server
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+  server.listen(PORT, () => console.log(`Server listening on ${PORT}`));
 }
 
+export { app, server, socketService };
 export default app;

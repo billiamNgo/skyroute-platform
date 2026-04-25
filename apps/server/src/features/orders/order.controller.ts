@@ -1,8 +1,12 @@
 import { Request, Response } from 'express';
 import { OrderService } from './order.service';
+import { SocketService } from '../realtime/socket.service';
 
 export class OrderController {
-    constructor(private orderService: OrderService) {}
+    constructor(
+        private orderService: OrderService,
+        private socketService: SocketService
+    ) {}
 
     getAllOrders = async (req: Request, res: Response) => {
         try {
@@ -30,6 +34,10 @@ export class OrderController {
             const { droneId } = req.body;
             const pharmacyId = Number((req as any).user.pharmacyId);
             const updatedOrder = await this.orderService.assignDrone(Number(req.params.id), droneId, pharmacyId);
+            
+            // Broadcast the assignment via Socket.io
+            this.socketService.broadcastOrderAssignment(pharmacyId, updatedOrder.orderID, droneId);
+
             return res.json(updatedOrder);
         } catch (error: any) {
             return res.status(error.status || 500).json({ message: error.message || 'Internal server error' });
