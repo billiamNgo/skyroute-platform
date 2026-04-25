@@ -61,22 +61,57 @@ async function start() {
         }
     });
 
-    socket.on('order:assigned', async (data: { orderId: number; droneId: number; pharmacyId: number }) => {
+    socket.on('order:assigned', async (data: { 
+        orderId: number; 
+        droneId: number; 
+        pharmacyId: number;
+        orderLat?: number; 
+        orderLon?: number;
+        pharmacyLat?: number;
+        pharmacyLon?: number;
+    }) => {
         if (data.droneId !== DRONE_ID || isBusy) return;
 
         console.log(`Mission received: Order ${data.orderId} assigned!`);
+        console.log(`Target Location: ${data.orderLat}, ${data.orderLon}`);
+        
         isBusy = true;
 
-        // Simulate Mission
-        await runMission(socket, data.orderId);
+        // Default to current Tallahassee mock if coordinates are missing (safety fallback)
+        const startLat = data.pharmacyLat || 30.4383;
+        const startLon = data.pharmacyLon || -84.2807;
+        const destLat = data.orderLat || (startLat + 0.01);
+        const destLon = data.orderLon || (startLon + 0.01);
 
-        console.log(`Mission complete: Order ${data.orderId} delivered.`);
-        isBusy = false;
+        // Simulate Mission: Phase 1 - Outbound
+        console.log(`Phase 1: Outbound to delivery address...`);
+        await runFlight(socket, data.orderId, startLat, startLon, destLat, destLon);
 
-        // Report status back to server as IDLE and mission complete
+        console.log(`Order ${data.orderId} arrived at destination. Marking as DELIVERED.`);
+        
+        // Report delivery complete (this sets order status to DELIVERED and drone status to IDLE on server temporarily)
         socket.emit('drone:statusUpdate', {
             droneId: DRONE_ID,
             orderId: data.orderId,
+            status: 'IDLE' // This triggers the server's DELIVERED logic
+        });
+
+        // Immediately update drone back to IN_TRANSIT for the return trip
+        socket.emit('drone:statusUpdate', {
+            droneId: DRONE_ID,
+            status: 'IN_TRANSIT'
+        });
+
+        // Phase 2: Inbound - Return to Pharmacy
+        console.log(`Phase 2: Inbound - Returning to pharmacy...`);
+        await runFlight(socket, data.orderId, destLat, destLon, startLat, startLon);
+
+        console.log(`Mission complete: Drone returned to pharmacy.`);
+        isBusy = false;
+
+        // Final status update to IDLE
+        socket.emit('drone:statusUpdate', {
+            droneId: DRONE_ID,
             status: 'IDLE'
         });
     });
@@ -90,17 +125,22 @@ async function start() {
     });
 }
 
-async function runMission(socket: Socket, orderId: number) {
-    // Start coordinates (mocking a pharmacy location)
-    let lat = 30.4383 + (Math.random() - 0.5) * 0.01;
-    let lon = -84.2807 + (Math.random() - 0.5) * 0.01;
+async function runFlight(
+    socket: Socket, 
+    orderId: number, 
+    startLat: number, 
+    startLon: number, 
+    endLat: number, 
+    endLon: number
+) {
+    const steps = 5; // Use fewer steps for demo speed, or more for realism
+    
+    for (let i = 1; i <= steps; i++) {
+        // Linear interpolation
+        const lat = startLat + (endLat - startLat) * (i / steps);
+        const lon = startLon + (endLon - startLon) * (i / steps);
 
-    const steps = 10;
-    const latStep = 0.001; // Mock movement
-    const lonStep = 0.001;
-
-    for (let i = 0; i <= steps; i++) {
-        console.log(`Order ${orderId}: Telemetry update - Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`);
+        console.log(`Order ${orderId}: Telemetry update - Lat: ${lat.toFixed(6)}, Lon: ${lon.toFixed(6)} (${i}/${steps})`);
         
         socket.emit('drone:telemetry', {
             droneId: DRONE_ID,
@@ -109,11 +149,8 @@ async function runMission(socket: Socket, orderId: number) {
             longitude: lon
         });
 
-        lat += latStep;
-        lon += lonStep;
-
-        // Wait 15 seconds between updates
-        await new Promise(resolve => setTimeout(resolve, 15000));
+        // Wait between updates (reduced for demo purposes)
+        await new Promise(resolve => setTimeout(resolve, 5000));
     }
 }
 
