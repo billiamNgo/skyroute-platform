@@ -27,8 +27,8 @@ export default function CustomerTracking() {
                 return "Delivered";
             default:
                 return status;
-        };
-    }
+        }
+    };
 
     const fetchTracking = async (id: string) => { 
         setLoading(true);
@@ -40,15 +40,7 @@ export default function CustomerTracking() {
                 `http://localhost:8080/orders/track/${id}`
             );
 
-            const text = await res.json();
-            let data;
-
-            try { 
-                data = JSON.parse(text);
-            } catch { 
-                console.error("Raw response from /track:", text);
-                throw new Error("Failed to parse response from server.");
-            }
+            const data = await res.json();
 
             if (!res.ok) { 
                 throw new Error(data.message || "Tracking number not found.");
@@ -107,11 +99,19 @@ export default function CustomerTracking() {
           </button>
         </form>
 
-        {loading ? (
-          <div className="tracking-loading">Checking status...</div>
-        ) : error ? (
-          <div className="tracking-error">{error}</div>
-        ) : result ? (
+        {loading && (
+          <div className="tracking-loading">
+            Checking status...
+          </div>
+        )}
+
+        {error && (
+          <div className="tracking-error">
+            {error}
+          </div>
+        )}
+
+        {result && (
           <div className="tracking-result-card">
             <h2>Status: {formatStatus(result.status)}</h2>
 
@@ -125,7 +125,11 @@ export default function CustomerTracking() {
               </p>
             )}
           </div>
-        ) : null}
+        )}
+
+        <div className="auth-link-row" style={{ marginTop: "30px" }}>
+          Want to go back? <Link to="/">Back to Home</Link>
+        </div>
 
       </div>
     </div>
