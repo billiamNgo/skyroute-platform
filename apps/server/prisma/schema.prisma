@@ -30,6 +30,8 @@ model Pharmacies {
     city           String
     state          String
     zip            Int
+    latitude       Float?
+    longitude      Float?
     users          User[]
     drones         Drones[]
     orders         Orders[]
@@ -57,6 +59,8 @@ model Orders {
     city               String
     state              String
     zip                Int
+    latitude           Float?
+    longitude          Float?
     status             String      @default("PENDING")
     medicationName     String
 }
