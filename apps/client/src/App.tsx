@@ -10,6 +10,7 @@ import PharmacistOrdersPage from "./pages/PharmacistOrdersPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import OrdersPage from "./pages/OrdersPage";
 import DroneManagementPage from "./pages/DroneManagementPage";
+import DroneTrackingPage from "./pages/DroneTrackingPage";
 
 function App() {
   return (
@@ -85,6 +86,16 @@ function App() {
             <ProtectedRoute
               allowedRole="technician"
               component={<DroneManagementPage />}
+            />
+          }
+        />
+
+        <Route
+          path="/fleet/track/:id"
+          element={
+            <ProtectedRoute
+              allowedRole="technician"
+              component={<DroneTrackingPage />}
             />
           }
         />
