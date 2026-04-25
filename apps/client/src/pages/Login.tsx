@@ -114,6 +114,9 @@ export default function Login() {
                 <div className="auth-link-row">
                     Don't have an account? <Link to="/register">Create Account</Link>
                 </div>
+                <div className="auth-link-row">
+                    Want to go back? <Link to="/"> Back to Home</Link>
+                </div>
             </div>
         </div>
     );

@@ -1,0 +1,41 @@
+.tracking-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.tracking-input {
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  width: 320px;
+  min-width: 250px;
+  font-size: 1rem;
+}
+
+.tracking-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+}
+
+.tracking-form button {
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.tracking-container {
+  text-align: center;
+  max-width: 500px;
+}
+
+.tracking-error {
+  margin-top: 15px;
+  color: #ef4444;
+  font-weight: 500;
+}

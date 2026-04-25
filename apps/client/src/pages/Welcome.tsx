@@ -33,7 +33,14 @@ export default function Welcome() {
                     onClick={() => navigate("/register")}
                     >
                     Register
-                    </button>        
+                    </button>     
+
+                <button
+                    className="welcome-button welcome-track-button"
+                    onClick={() => navigate("/tracking")}
+                    >
+                    Track Order
+                    </button>   
                 </div>
             </div>
         </div>
