@@ -36,7 +36,15 @@ export class OrderController {
             const updatedOrder = await this.orderService.assignDrone(Number(req.params.id), droneId, pharmacyId);
             
             // Broadcast the assignment via Socket.io
-            this.socketService.broadcastOrderAssignment(pharmacyId, updatedOrder.orderID, droneId);
+            this.socketService.broadcastOrderAssignment(
+                pharmacyId, 
+                updatedOrder.orderID, 
+                droneId,
+                updatedOrder.latitude,
+                updatedOrder.longitude,
+                (updatedOrder as any).pharmacy?.latitude,
+                (updatedOrder as any).pharmacy?.longitude
+            );
 
             return res.json(updatedOrder);
         } catch (error: any) {

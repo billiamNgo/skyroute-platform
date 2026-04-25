@@ -147,13 +147,25 @@ export class SocketService {
         });
     }
 
-    public broadcastOrderAssignment(pharmacyId: number, orderId: number, droneId: number) {
+    public broadcastOrderAssignment(
+        pharmacyId: number, 
+        orderId: number, 
+        droneId: number, 
+        orderLat?: number, 
+        orderLon?: number, 
+        pharmacyLat?: number, 
+        pharmacyLon?: number
+    ) {
         const roomName = `pharmacy_${pharmacyId}`;
         this.io.to(roomName).emit('order:assigned', {
             orderId,
             droneId,
-            pharmacyId
+            pharmacyId,
+            orderLat,
+            orderLon,
+            pharmacyLat,
+            pharmacyLon
         });
-        console.log(`Broadcasted order ${orderId} assigned to drone ${droneId} in room ${roomName}`);
+        console.log(`Broadcasted order ${orderId} assigned to drone ${droneId} in room ${roomName} with coordinates`);
     }
 }
