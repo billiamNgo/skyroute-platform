@@ -59,8 +59,6 @@ model Orders {
     city               String
     state              String
     zip                Int
-    latitude           Float?
-    longitude          Float?
     status             String      @default("PENDING")
     medicationName     String
 }

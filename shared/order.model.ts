@@ -8,11 +8,8 @@ export interface Order {
     city: string;
     state: string;
     zip: number;
-    latitude?: number;
-    longitude?: number;
     status?: string;
     medicationName: string;
-    pharmacy?: any; // Nested pharmacy object to prevent double calls to db
 }
 
 export enum OrderStatus {
