@@ -112,6 +112,28 @@ async function main() {
     });
 
     console.log(`Ensured service account ${serviceUser.email} for pharmacy ${pharmacy.name} with password ${servicePasswordRaw}`);
+
+    // Create drone-specific service account for this pharmacy
+    const droneEmail = 'drones@' + p.name.toLowerCase().replace(/\s+/g, '') + '.com';
+    const droneUser = await prisma.user.upsert({
+      where: { email: droneEmail },
+      create: {
+        email: droneEmail,
+        firstName: `${p.name}-drone`,
+        lastName: 'Fleet',
+        password: hashed,
+        role: 'drone',
+        pharmacyID: pharmacy.pharmacyID,
+      },
+      update: {
+        firstName: `${p.name}-drone`,
+        lastName: 'Fleet',
+        password: hashed,
+        role: 'drone',
+        pharmacyID: pharmacy.pharmacyID,
+      },
+    });
+    console.log(`Ensured drone account ${droneUser.email} for pharmacy ${pharmacy.name} with password ${servicePasswordRaw}`);
   }
 
   // Create drones and orders for each pharmacy
