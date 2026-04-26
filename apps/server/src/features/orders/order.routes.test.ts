@@ -37,13 +37,18 @@ describe('Order Routes Integration', () => {
     });
 
     it('POST /orders/assign/:id should parse body and params', async () => {
-        const spy = jest.spyOn(PrismaOrderService.prototype, 'assignDrone').mockResolvedValue({} as any);
+        const { DefaultMissionService } = require('../delivery/default-mission.service');
+        const { PrismaOrderService } = require('./prisma-order.service');
+        
+        const missionSpy = jest.spyOn(DefaultMissionService.prototype, 'assignMission').mockResolvedValue(undefined);
+        const orderSpy = jest.spyOn(PrismaOrderService.prototype, 'getOrderById').mockResolvedValue({ orderID: 50 } as any);
 
         const response = await request(app)
             .post('/orders/assign/50')
             .send({ droneId: 99 });
 
-        expect(spy).toHaveBeenCalledWith(50, 99, 1);
+        expect(missionSpy).toHaveBeenCalledWith(50, 99, 1);
+        expect(orderSpy).toHaveBeenCalledWith(50, 1);
         expect(response.status).toBe(200);
     });
 });

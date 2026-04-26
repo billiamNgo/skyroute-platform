@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { OrderService } from './order.service';
-import { SocketService } from '../realtime/socket.service';
+import { MissionService } from '../delivery/mission.service';
 
 export class OrderController {
     constructor(
         private orderService: OrderService,
-        private socketService: SocketService
+        private missionService: MissionService
     ) {}
 
     getAllOrders = async (req: Request, res: Response) => {
@@ -33,21 +33,16 @@ export class OrderController {
         try {
             const { droneId } = req.body;
             const pharmacyId = Number((req as any).user.pharmacyId);
-            const updatedOrder = await this.orderService.assignDrone(Number(req.params.id), droneId, pharmacyId);
+            const orderId = Number(req.params.id);
             
-            // Broadcast the assignment via Socket.io
-            this.socketService.broadcastOrderAssignment(
-                pharmacyId, 
-                updatedOrder.orderID, 
-                droneId,
-                updatedOrder.latitude,
-                updatedOrder.longitude,
-                (updatedOrder as any).pharmacy?.latitude,
-                (updatedOrder as any).pharmacy?.longitude
-            );
-
+            // Delegate mission orchestration to the MissionService
+            await this.missionService.assignMission(orderId, droneId, pharmacyId);
+            
+            // Return updated order for UI feedback
+            const updatedOrder = await this.orderService.getOrderById(orderId, pharmacyId);
             return res.json(updatedOrder);
         } catch (error: any) {
+            console.error('Assignment error:', error);
             return res.status(error.status || 500).json({ message: error.message || 'Internal server error' });
         }
     };
