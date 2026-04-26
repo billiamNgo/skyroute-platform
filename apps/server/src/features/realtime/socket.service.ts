@@ -74,8 +74,8 @@ export class SocketService {
             });
 
             // Handle Drone Telemetry
-            socket.on('drone:telemetry', async (data: { droneId: number; latitude: number; longitude: number; pharmacyId: number }) => {
-                const { droneId, latitude, longitude, pharmacyId } = data;
+            socket.on('drone:telemetry', async (data: { droneId: number; latitude: number; longitude: number; pharmacyId: number; batteryLevel?: number }) => {
+                const { droneId, latitude, longitude, pharmacyId, batteryLevel } = data;
                 const authenticatedPharmacyId = (socket as any).user.pharmacyId;
 
                 if (authenticatedPharmacyId && authenticatedPharmacyId !== pharmacyId) {
@@ -93,11 +93,20 @@ export class SocketService {
                         }
                     });
 
+                    // Update Drone's battery level if provided
+                    if (batteryLevel !== undefined) {
+                        await this.prisma.drones.update({
+                            where: { droneID: droneId },
+                            data: { batteryLevel }
+                        });
+                    }
+
                     // 2. Broadcast to UI clients in the same pharmacy room
                     this.io.to(`pharmacy_${pharmacyId}`).emit('drone:locationUpdate', {
                         droneId,
                         latitude,
                         longitude,
+                        batteryLevel,
                         timestamp: new Date()
                     });
 

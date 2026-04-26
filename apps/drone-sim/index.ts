@@ -98,28 +98,44 @@ async function start() {
     });
 }
 
+// Maintain global battery state for this drone instance
+let currentBatteryLevel = 100;
+
 async function runMission(socket: Socket, mission: any) {
     const { orderId, originLat, originLon, destinationLat, destinationLon } = mission;
 
-    const steps = 5;
+    // Calculate straight-line distance in degrees
+    const deltaLat = destinationLat - originLat;
+    const deltaLon = destinationLon - originLon;
+    const distanceDegrees = Math.sqrt(deltaLat * deltaLat + deltaLon * deltaLon);
+    
+    // Speed: ~0.0025 degrees per 15-second update (roughly 277 meters per 15s = ~41 mph)
+    const SPEED_DEGREES_PER_STEP = 0.0025;
+    const BATTERY_DRAIN_PER_STEP = 0.5; // 0.5% drain per 15 seconds
+    
+    // Calculate dynamic steps based on actual distance (minimum 1 step)
+    const steps = Math.max(1, Math.ceil(distanceDegrees / SPEED_DEGREES_PER_STEP));
 
     // ----- Phase 1: Outbound to Destination -----
-    console.log(`Phase 1: Outbound to delivery address...`);
-    let latStep = (destinationLat - originLat) / steps;
-    let lonStep = (destinationLon - originLon) / steps;
+    console.log(`Phase 1: Outbound to delivery address... (${steps} updates estimated)`);
+    let latStep = deltaLat / steps;
+    let lonStep = deltaLon / steps;
     let currentLat = originLat;
     let currentLon = originLon;
 
     for (let i = 1; i <= steps; i++) {
         currentLat += latStep;
         currentLon += lonStep;
-        console.log(`Order ${orderId}: Telemetry update - Lat: ${currentLat.toFixed(6)}, Lon: ${currentLon.toFixed(6)} (${i}/${steps})`);
+        currentBatteryLevel = Math.max(0, currentBatteryLevel - BATTERY_DRAIN_PER_STEP);
+        
+        console.log(`Order ${orderId}: Telemetry - Lat: ${currentLat.toFixed(6)}, Lon: ${currentLon.toFixed(6)} | Battery: ${currentBatteryLevel.toFixed(1)}% (${i}/${steps})`);
         
         socket.emit('drone:telemetry', {
             droneId: DRONE_ID,
             pharmacyId: PHARMACY_ID,
             latitude: currentLat,
-            longitude: currentLon
+            longitude: currentLon,
+            batteryLevel: Math.round(currentBatteryLevel)
         });
         await new Promise(resolve => setTimeout(resolve, 15000));
     }
@@ -132,22 +148,24 @@ async function runMission(socket: Socket, mission: any) {
     });
 
     // ----- Phase 2: Inbound to Pharmacy -----
-    console.log(`Phase 2: Inbound - Returning to pharmacy...`);
-    latStep = (originLat - destinationLat) / steps;
-    lonStep = (originLon - destinationLon) / steps;
-    currentLat = destinationLat;
-    currentLon = destinationLon;
+    console.log(`Phase 2: Inbound - Returning to pharmacy... (${steps} updates estimated)`);
+    // Reverse the step directions
+    latStep = -latStep;
+    lonStep = -lonStep;
 
     for (let i = 1; i <= steps; i++) {
         currentLat += latStep;
         currentLon += lonStep;
-        console.log(`Order ${orderId}: Telemetry update - Lat: ${currentLat.toFixed(6)}, Lon: ${currentLon.toFixed(6)} (${i}/${steps})`);
+        currentBatteryLevel = Math.max(0, currentBatteryLevel - BATTERY_DRAIN_PER_STEP);
+        
+        console.log(`Order ${orderId}: Telemetry - Lat: ${currentLat.toFixed(6)}, Lon: ${currentLon.toFixed(6)} | Battery: ${currentBatteryLevel.toFixed(1)}% (${i}/${steps})`);
         
         socket.emit('drone:telemetry', {
             droneId: DRONE_ID,
             pharmacyId: PHARMACY_ID,
             latitude: currentLat,
-            longitude: currentLon
+            longitude: currentLon,
+            batteryLevel: Math.round(currentBatteryLevel)
         });
         await new Promise(resolve => setTimeout(resolve, 15000));
     }
