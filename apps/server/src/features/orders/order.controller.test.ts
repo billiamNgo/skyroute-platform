@@ -21,7 +21,7 @@ describe('OrderController', () => {
             broadcastOrderAssignment: jest.fn(),
         } as any;
 
-        controller = new OrderController(mockService, mockSocketService);
+        controller = new OrderController(mockService);
         jsonMock = jest.fn();
         statusMock = jest.fn().mockReturnValue({ json: jsonMock });
         res = { json: jsonMock, status: statusMock };
