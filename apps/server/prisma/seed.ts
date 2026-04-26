@@ -168,73 +168,55 @@ async function main() {
         firstName: 'John',
         lastName: 'Smith',
         address: '5634 Woodbine Rd',
-        medication: 'Aspirin',
-        latitude: 30.6045,
-        longitude: -87.1605,
+        medication: 'Aspirin'
       },
       {
         firstName: 'Sarah',
         lastName: 'Johnson',
         address: '5400 Berryhill Rd',
-        medication: 'Lisinopril',
-        latitude: 30.6120,
-        longitude: -87.1550,
+        medication: 'Lisinopril'
       },
       {
         firstName: 'Michael',
         lastName: 'Williams',
         address: '4400 Bayou Blvd',
-        medication: 'Atorvastatin',
-        latitude: 30.4754,
-        longitude: -87.2023,
+        medication: 'Atorvastatin'
       },
       {
         firstName: 'Emily',
         lastName: 'Brown',
         address: '1000 College Blvd',
-        medication: 'Metformin',
-        latitude: 30.4810,
-        longitude: -87.2150,
+        medication: 'Metformin'
       },
       {
         firstName: 'David',
         lastName: 'Miller',
         address: '3900 Hwy 90',
-        medication: 'Amoxicillin',
-        latitude: 30.5995,
-        longitude: -87.1610,
+        medication: 'Amoxicillin'
       },
       {
         firstName: 'Jessica',
         lastName: 'Davis',
         address: '4000 Hwy 90',
-        medication: 'Ibuprofen',
-        latitude: 30.6000,
-        longitude: -87.1600,
+        medication: 'Ibuprofen'
       },
       {
         firstName: 'James',
         lastName: 'Garcia',
         address: '6000 N 9th Ave',
-        medication: 'Omeprazole',
-        latitude: 30.4850,
-        longitude: -87.1980,
+        medication: 'Omeprazole'
       },
       {
         firstName: 'Amanda',
         lastName: 'Martinez',
         address: '6500 N 9th Ave',
-        medication: 'Metoprolol',
-        latitude: 30.4920,
-        longitude: -87.1950,
+        medication: 'Metoprolol'
       },
       {
         firstName: 'Christopher',
         lastName: 'Rodriguez',
         address: '6200 N 9th Ave',
-        medication: 'Sertraline',
-        latitude: 30.4870,
-        longitude: -87.1970,
+        medication: 'Sertraline'
       },
     ];
 
@@ -252,8 +234,6 @@ async function main() {
           city: p.city,
           state: p.state,
           zip: p.zip,
-          latitude: data.latitude,
-          longitude: data.longitude,
           status: 'PENDING',
           medicationName: data.medication,
         },

@@ -61,39 +61,40 @@ async function start() {
         }
     });
 
-    socket.on('order:assigned', async (data: { 
+    socket.on('order:assigned', async (delivery: { 
         orderId: number; 
         droneId: number; 
         pharmacyId: number;
-        orderLat?: number; 
-        orderLon?: number;
-        pharmacyLat?: number;
-        pharmacyLon?: number;
+        originLat: number;
+        originLon: number;
+        destinationLat: number;
+        destinationLon: number;
     }) => {
-        if (data.droneId !== DRONE_ID || isBusy) return;
+        if (delivery.droneId !== DRONE_ID || isBusy) return;
 
-        console.log(`Mission received: Order ${data.orderId} assigned!`);
-        console.log(`Target Location: ${data.orderLat}, ${data.orderLon}`);
+        console.log(`Mission received: Order ${delivery.orderId} assigned!`);
+        console.log(`Target Location: ${delivery.destinationLat}, ${delivery.destinationLon}`);
         
         isBusy = true;
 
-        // Default to current Tallahassee mock if coordinates are missing (safety fallback)
-        const startLat = data.pharmacyLat || 30.4383;
-        const startLon = data.pharmacyLon || -84.2807;
-        const destLat = data.orderLat || (startLat + 0.01);
-        const destLon = data.orderLon || (startLon + 0.01);
-
         // Simulate Mission: Phase 1 - Outbound
         console.log(`Phase 1: Outbound to delivery address...`);
-        await runFlight(socket, data.orderId, startLat, startLon, destLat, destLon);
+        await runFlight(
+            socket, 
+            delivery.orderId, 
+            delivery.originLat, 
+            delivery.originLon, 
+            delivery.destinationLat, 
+            delivery.destinationLon
+        );
 
-        console.log(`Order ${data.orderId} arrived at destination. Marking as DELIVERED.`);
+        console.log(`Order ${delivery.orderId} arrived at destination. Marking as DELIVERED.`);
         
-        // Report delivery complete (this sets order status to DELIVERED and drone status to IDLE on server temporarily)
+        // Report delivery complete
         socket.emit('drone:statusUpdate', {
             droneId: DRONE_ID,
-            orderId: data.orderId,
-            status: 'IDLE' // This triggers the server's DELIVERED logic
+            orderId: delivery.orderId,
+            status: 'IDLE'
         });
 
         // Immediately update drone back to IN_TRANSIT for the return trip
@@ -104,7 +105,14 @@ async function start() {
 
         // Phase 2: Inbound - Return to Pharmacy
         console.log(`Phase 2: Inbound - Returning to pharmacy...`);
-        await runFlight(socket, data.orderId, destLat, destLon, startLat, startLon);
+        await runFlight(
+            socket, 
+            delivery.orderId, 
+            delivery.destinationLat, 
+            delivery.destinationLon, 
+            delivery.originLat, 
+            delivery.originLon
+        );
 
         console.log(`Mission complete: Drone returned to pharmacy.`);
         isBusy = false;
