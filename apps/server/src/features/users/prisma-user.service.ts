@@ -14,6 +14,15 @@ export class PrismaUserService implements UserService {
         this.prisma = new PrismaClient({ adapter });
     }
 
+    async getUserProfile(userId: number): Promise<User> {
+        const user = await this.prisma.user.findUnique({ where: { userID: userId } });
+        if (!user) {
+            throw createError(404, "User not found");
+        }
+        const { password, ...safeUser } = user;
+        return safeUser as User;
+    }
+
     async updateUserProfile(userId: number, updateData: Partial<User>): Promise<User> {
         const user = await this.prisma.user.findUnique({ where: { userID: userId } });
         if (!user) {
@@ -60,5 +69,15 @@ export class PrismaUserService implements UserService {
 
         const { password, ...safeUser } = updated;
         return safeUser as User;
+    }
+
+    async getUnassignedUsers(): Promise<User[]> {
+        const users = await this.prisma.user.findMany({
+            where: {
+                pharmacyID: null
+            }
+        });
+
+        return users.map(({ password, ...safeUser }) => safeUser as User);
     }
 }

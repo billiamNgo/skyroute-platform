@@ -4,6 +4,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import http from 'http';
 import TokenService from '../token/token.service';
 import { OrderStatus } from '@shared/order.model';
+import { DroneDelivery } from '@shared/delivery.model';
 
 export class SocketService {
     private io: Server;
@@ -73,8 +74,8 @@ export class SocketService {
             });
 
             // Handle Drone Telemetry
-            socket.on('drone:telemetry', async (data: { droneId: number; latitude: number; longitude: number; pharmacyId: number }) => {
-                const { droneId, latitude, longitude, pharmacyId } = data;
+            socket.on('drone:telemetry', async (data: { droneId: number; latitude: number; longitude: number; pharmacyId: number; batteryLevel?: number }) => {
+                const { droneId, latitude, longitude, pharmacyId, batteryLevel } = data;
                 const authenticatedPharmacyId = (socket as any).user.pharmacyId;
 
                 if (authenticatedPharmacyId && authenticatedPharmacyId !== pharmacyId) {
@@ -92,11 +93,20 @@ export class SocketService {
                         }
                     });
 
+                    // Update Drone's battery level if provided
+                    if (batteryLevel !== undefined) {
+                        await this.prisma.drones.update({
+                            where: { droneID: droneId },
+                            data: { batteryLevel }
+                        });
+                    }
+
                     // 2. Broadcast to UI clients in the same pharmacy room
                     this.io.to(`pharmacy_${pharmacyId}`).emit('drone:locationUpdate', {
                         droneId,
                         latitude,
                         longitude,
+                        batteryLevel,
                         timestamp: new Date()
                     });
 
@@ -120,22 +130,22 @@ export class SocketService {
                         }
                     }
 
-                    // 1. Update Drone Status
-                    await this.prisma.drones.update({
-                        where: { droneID: droneId },
-                        data: { currentStatus: status }
-                    });
-
-                    // 2. If mission complete, update Order Status
-                    if (status === 'IDLE' && orderId) {
+                    // Handle routing of status updates based on the target entity
+                    if (status === 'DELIVERED' && orderId) {
+                        // Update Order to DELIVERED
                         await this.prisma.orders.update({
                             where: { orderID: orderId },
                             data: { status: OrderStatus.DELIVERED }
                         });
                         console.log(`Order ${orderId} marked as DELIVERED by drone ${droneId}`);
+                    } else {
+                        // Update Drone status (IDLE, IN_TRANSIT, PENDING, etc.)
+                        await this.prisma.drones.update({
+                            where: { droneID: droneId },
+                            data: { currentStatus: status }
+                        });
+                        console.log(`Drone ${droneId} status updated to ${status}`);
                     }
-
-                    console.log(`Drone ${droneId} status updated to ${status}`);
                 } catch (error) {
                     console.error(`Error updating status for drone ${droneId}:`, error);
                 }
@@ -147,13 +157,9 @@ export class SocketService {
         });
     }
 
-    public broadcastOrderAssignment(pharmacyId: number, orderId: number, droneId: number) {
-        const roomName = `pharmacy_${pharmacyId}`;
-        this.io.to(roomName).emit('order:assigned', {
-            orderId,
-            droneId,
-            pharmacyId
-        });
-        console.log(`Broadcasted order ${orderId} assigned to drone ${droneId} in room ${roomName}`);
+    public broadcastOrderAssignment(delivery: DroneDelivery) {
+        const roomName = `pharmacy_${delivery.pharmacyId}`;
+        this.io.to(roomName).emit('order:assigned', delivery);
+        console.log(`Broadcasted order ${delivery.orderId} assigned to drone ${delivery.droneId} in room ${roomName}`);
     }
 }

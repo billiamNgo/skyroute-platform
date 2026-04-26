@@ -7,6 +7,7 @@ export interface Drone {
 
 export enum DroneStatus {
     IDLE = "IDLE",
+    PENDING = "PENDING",
     IN_TRANSIT = "IN_TRANSIT",
     CHARGING = "CHARGING",
     MAINTENANCE = "MAINTENANCE"

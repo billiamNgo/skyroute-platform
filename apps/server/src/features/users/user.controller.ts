@@ -4,6 +4,16 @@ import { UserService } from './user.service';
 export class UserController {
     constructor(private userService: UserService) {}
 
+    getProfile = async (req: Request, res: Response) => {
+        try {
+            const userId = Number(req.user.userID);
+            const user = await this.userService.getUserProfile(userId);
+            return res.json(user);
+        } catch (error: any) {
+            return res.status(error.status || 500).json({ message: error.message || 'Internal server error' });
+        }
+    };
+
     updateProfile = async (req: Request, res: Response) => {
         try {
             const userId = Number(req.user.userID); // Extracted from JWT payload
@@ -25,6 +35,15 @@ export class UserController {
 
             const updatedUser = await this.userService.assignUserToPharmacy(targetUserId, adminPharmacyId);
             return res.json(updatedUser);
+        } catch (error: any) {
+            return res.status(error.status || 500).json({ message: error.message || 'Internal server error' });
+        }
+    };
+
+    getUnassignedUsers = async (req: Request, res: Response) => {
+        try {
+            const users = await this.userService.getUnassignedUsers();
+            return res.json(users);
         } catch (error: any) {
             return res.status(error.status || 500).json({ message: error.message || 'Internal server error' });
         }

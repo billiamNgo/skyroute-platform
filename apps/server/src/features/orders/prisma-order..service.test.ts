@@ -62,7 +62,7 @@ describe('PrismaOrderService', () => {
             await service.assignDrone(1, 2);
 
             expect(prismaMock.drones.update).toHaveBeenCalledWith(expect.objectContaining({
-                data: { currentStatus: 'IN_TRANSIT' }
+                data: { currentStatus: 'PENDING' }
             }));
             expect(prismaMock.orders.update).toHaveBeenCalledWith(expect.objectContaining({
                 data: { droneID: 2, status: OrderStatus.IN_TRANSIT }

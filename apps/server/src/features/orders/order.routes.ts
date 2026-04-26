@@ -3,12 +3,12 @@ import { OrderController } from './order.controller';
 import { PrismaOrderService } from './prisma-order.service';
 import { SocketService } from '../realtime/socket.service';
 
-export default function orderRoutes(security: any, socketService: SocketService) {
+export default function orderRoutes(security: any) {
     const router = Router();
 
     // Dependency injection for OrderService into OrderController
     const service = new PrismaOrderService();
-    const controller = new OrderController(service, socketService);
+    const controller = new OrderController(service);
 
     router.get('/', 
         security.authenticateJWT,
