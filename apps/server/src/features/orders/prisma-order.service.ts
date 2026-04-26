@@ -3,6 +3,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { Order, OrderStatus } from '@shared/order.model';
 import { OrderService } from './order.service';
 import createError from 'http-errors';
+import { eventBus } from '../../events/event-bus';
 
 export class PrismaOrderService implements OrderService {
     private prisma: PrismaClient;
@@ -100,19 +101,24 @@ export class PrismaOrderService implements OrderService {
             throw createError(403, 'Forbidden: Drone does not belong to your pharmacy');
         }
 
-        // Update drone status to IN_TRANSIT
+        // Update drone status to PENDING (waiting for geodata)
         await this.prisma.drones.update({
             where: { droneID: droneId },
-            data: { currentStatus: 'IN_TRANSIT' }
+            data: { currentStatus: 'PENDING' }
         });
 
         // Assign drone and update order status to IN_TRANSIT
-        return await this.prisma.orders.update({
+        const updatedOrder = await this.prisma.orders.update({
             where: { orderID: orderId },
             data: { 
                 droneID: droneId,
                 status: OrderStatus.IN_TRANSIT 
             }
         }) as Order;
+
+        // Emit domain event for background geocoding and dispatch
+        eventBus.emit('mission:pending', { orderId, droneId, pharmacyId });
+
+        return updatedOrder;
     }
 }
