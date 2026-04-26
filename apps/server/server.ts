@@ -11,6 +11,7 @@ import orderRoutes from './src/features/orders/order.routes';
 import droneRoutes from './src/features/drones/drone.routes';
 import userRoutes from './src/features/users/user.routes';
 import { SocketService } from './src/features/realtime/socket.service';
+import { MissionListener } from './src/features/delivery/mission.listener';
 
 const app = express();
 const server = http.createServer(app);
@@ -28,6 +29,9 @@ const security = SecurityMiddleware(tokenService);
 // 3. Socket.io initialization
 const socketService = new SocketService(server, tokenService);
 
+// 3.5 Delivery Mission Background Listener
+const missionListener = new MissionListener(socketService);
+
 // 4. Global middleware
 app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
@@ -35,7 +39,7 @@ app.use(express.json());
 // 5. Feature Routes
 app.use('/auth', authRoutes);
 app.use('/pharmacy', pharmacyRoutes(security));
-app.use('/orders', orderRoutes(security, socketService)); // Passing socketService to orders
+app.use('/orders', orderRoutes(security));
 app.use('/drones', droneRoutes(security));
 app.use('/users', userRoutes(security));
 

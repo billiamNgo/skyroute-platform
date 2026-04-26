@@ -61,24 +61,32 @@ async function start() {
         }
     });
 
-    socket.on('order:assigned', async (data: { orderId: number; droneId: number; pharmacyId: number }) => {
+    socket.on('order:assigned', async (data: any) => {
+        // data should be of type DroneDelivery
         if (data.droneId !== DRONE_ID || isBusy) return;
 
         console.log(`Mission received: Order ${data.orderId} assigned!`);
+        console.log(`Target Location: ${data.destinationLat}, ${data.destinationLon}`);
         isBusy = true;
 
-        // Simulate Mission
-        await runMission(socket, data.orderId);
+        // Immediately update drone status to IN_TRANSIT now that we have geodata
+        socket.emit('drone:statusUpdate', {
+            droneId: DRONE_ID,
+            orderId: data.orderId,
+            status: 'IN_TRANSIT'
+        });
 
-        console.log(`Mission complete: Order ${data.orderId} delivered.`);
+        // Simulate Mission
+        await runMission(socket, data);
+
         isBusy = false;
 
         // Report status back to server as IDLE and mission complete
         socket.emit('drone:statusUpdate', {
             droneId: DRONE_ID,
-            orderId: data.orderId,
             status: 'IDLE'
         });
+        console.log(`Mission complete: Drone returned to pharmacy.`);
     });
 
     socket.on('disconnect', () => {
@@ -90,30 +98,58 @@ async function start() {
     });
 }
 
-async function runMission(socket: Socket, orderId: number) {
-    // Start coordinates (mocking a pharmacy location)
-    let lat = 30.4383 + (Math.random() - 0.5) * 0.01;
-    let lon = -84.2807 + (Math.random() - 0.5) * 0.01;
+async function runMission(socket: Socket, mission: any) {
+    const { orderId, originLat, originLon, destinationLat, destinationLon } = mission;
 
-    const steps = 10;
-    const latStep = 0.001; // Mock movement
-    const lonStep = 0.001;
+    const steps = 5;
 
-    for (let i = 0; i <= steps; i++) {
-        console.log(`Order ${orderId}: Telemetry update - Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`);
+    // ----- Phase 1: Outbound to Destination -----
+    console.log(`Phase 1: Outbound to delivery address...`);
+    let latStep = (destinationLat - originLat) / steps;
+    let lonStep = (destinationLon - originLon) / steps;
+    let currentLat = originLat;
+    let currentLon = originLon;
+
+    for (let i = 1; i <= steps; i++) {
+        currentLat += latStep;
+        currentLon += lonStep;
+        console.log(`Order ${orderId}: Telemetry update - Lat: ${currentLat.toFixed(6)}, Lon: ${currentLon.toFixed(6)} (${i}/${steps})`);
         
         socket.emit('drone:telemetry', {
             droneId: DRONE_ID,
             pharmacyId: PHARMACY_ID,
-            latitude: lat,
-            longitude: lon
+            latitude: currentLat,
+            longitude: currentLon
         });
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
 
-        lat += latStep;
-        lon += lonStep;
+    console.log(`Order ${orderId} arrived at destination. Marking as DELIVERED.`);
+    socket.emit('drone:statusUpdate', {
+        droneId: DRONE_ID,
+        orderId: orderId,
+        status: 'DELIVERED'
+    });
 
-        // Wait 15 seconds between updates
-        await new Promise(resolve => setTimeout(resolve, 15000));
+    // ----- Phase 2: Inbound to Pharmacy -----
+    console.log(`Phase 2: Inbound - Returning to pharmacy...`);
+    latStep = (originLat - destinationLat) / steps;
+    lonStep = (originLon - destinationLon) / steps;
+    currentLat = destinationLat;
+    currentLon = destinationLon;
+
+    for (let i = 1; i <= steps; i++) {
+        currentLat += latStep;
+        currentLon += lonStep;
+        console.log(`Order ${orderId}: Telemetry update - Lat: ${currentLat.toFixed(6)}, Lon: ${currentLon.toFixed(6)} (${i}/${steps})`);
+        
+        socket.emit('drone:telemetry', {
+            droneId: DRONE_ID,
+            pharmacyId: PHARMACY_ID,
+            latitude: currentLat,
+            longitude: currentLon
+        });
+        await new Promise(resolve => setTimeout(resolve, 1000));
     }
 }
 
