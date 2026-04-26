@@ -98,7 +98,7 @@ async function main() {
         firstName: serviceName,
         lastName: 'Service',
         password: hashed,
-        role: 'pharmacist',
+        role: 'pharmacy',
         pharmacyID: pharmacy.pharmacyID,
       },
       update: {
@@ -106,7 +106,7 @@ async function main() {
         firstName: serviceName,
         lastName: 'Service',
         password: hashed,
-        role: 'pharmacist',
+        role: 'pharmacy',
         pharmacyID: pharmacy.pharmacyID,
       },
     });
