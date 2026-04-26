@@ -3,9 +3,11 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { Drone, DroneLocation } from "@shared/drone.model";
 import { DroneService } from "./drone.service";
 import createError from 'http-errors';
+import { GeocodingWrapper } from "../delivery/geocoding.wrapper";
 
 export class PrismaDroneService implements DroneService {
     private prisma: PrismaClient;
+    private geocoding: GeocodingWrapper;
 
     constructor() {
         console.log('Database url:', process.env.DATABASE_URL);
@@ -13,6 +15,7 @@ export class PrismaDroneService implements DroneService {
         const connectionString = process.env.DATABASE_URL;
         const adapter = new PrismaPg({ connectionString });
         this.prisma = new PrismaClient({ adapter });
+        this.geocoding = new GeocodingWrapper();
     }
 
     async getDronesByPharmacy(pharmacyId: number): Promise<Drone[]> {
@@ -21,7 +24,7 @@ export class PrismaDroneService implements DroneService {
         }) as Drone[];
     }
 
-    async getDroneTrackingData(droneId: number, pharmacyId: number): Promise<{ drone: Drone; lastLocation: DroneLocation | null }> {
+    async getDroneTrackingData(droneId: number, pharmacyId: number): Promise<{ drone: Drone; lastLocation: DroneLocation | null; destinationLat?: number; destinationLon?: number }> {
         const drone = await this.prisma.drones.findUnique({
             where: { droneID: droneId },
             include: {
@@ -41,10 +44,36 @@ export class PrismaDroneService implements DroneService {
         }
 
         const { locations, ...droneData } = drone;
-        return {
+        const result: any = {
             drone: droneData as Drone,
             lastLocation: locations[0] as DroneLocation || null
         };
+
+        // If drone has an active order, fetch and geocode the destination
+        if (drone.currentStatus === 'IN_TRANSIT' && drone.droneID) {
+            const activeOrder = await this.prisma.orders.findFirst({
+                where: {
+                    droneID: droneId,
+                    status: 'IN_TRANSIT'
+                }
+            });
+
+            if (activeOrder) {
+                try {
+                    const destCoords = await this.geocoding.geocode(
+                        activeOrder.address,
+                        activeOrder.city,
+                        activeOrder.state
+                    );
+                    result.destinationLat = destCoords.latitude;
+                    result.destinationLon = destCoords.longitude;
+                } catch (err) {
+                    console.warn(`[DroneService] Could not geocode destination for order ${activeOrder.orderID}:`, err);
+                }
+            }
+        }
+
+        return result;
     }
 
     async updateDroneStatus(droneId: number, status: string): Promise<Drone> {
