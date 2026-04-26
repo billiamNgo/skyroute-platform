@@ -121,7 +121,7 @@ async function runMission(socket: Socket, mission: any) {
             latitude: currentLat,
             longitude: currentLon
         });
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 15000));
     }
 
     console.log(`Order ${orderId} arrived at destination. Marking as DELIVERED.`);
@@ -149,7 +149,7 @@ async function runMission(socket: Socket, mission: any) {
             latitude: currentLat,
             longitude: currentLon
         });
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 15000));
     }
 }
 

@@ -121,22 +121,22 @@ export class SocketService {
                         }
                     }
 
-                    // 1. Update Drone Status
-                    await this.prisma.drones.update({
-                        where: { droneID: droneId },
-                        data: { currentStatus: status }
-                    });
-
-                    // 2. If mission complete, update Order Status
-                    if (status === 'IDLE' && orderId) {
+                    // Handle routing of status updates based on the target entity
+                    if (status === 'DELIVERED' && orderId) {
+                        // Update Order to DELIVERED
                         await this.prisma.orders.update({
                             where: { orderID: orderId },
                             data: { status: OrderStatus.DELIVERED }
                         });
                         console.log(`Order ${orderId} marked as DELIVERED by drone ${droneId}`);
+                    } else {
+                        // Update Drone status (IDLE, IN_TRANSIT, PENDING, etc.)
+                        await this.prisma.drones.update({
+                            where: { droneID: droneId },
+                            data: { currentStatus: status }
+                        });
+                        console.log(`Drone ${droneId} status updated to ${status}`);
                     }
-
-                    console.log(`Drone ${droneId} status updated to ${status}`);
                 } catch (error) {
                     console.error(`Error updating status for drone ${droneId}:`, error);
                 }
