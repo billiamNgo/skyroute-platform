@@ -112,9 +112,6 @@ export class PrismaOrderService implements OrderService {
             data: { 
                 droneID: droneId,
                 status: OrderStatus.IN_TRANSIT 
-            },
-            include: {
-                pharmacy: true
             }
         }) as Order;
     }

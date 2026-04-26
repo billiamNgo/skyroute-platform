@@ -4,6 +4,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import http from 'http';
 import TokenService from '../token/token.service';
 import { OrderStatus } from '@shared/order.model';
+import { DroneDelivery } from '@shared/delivery.model';
 
 export class SocketService {
     private io: Server;
@@ -147,25 +148,9 @@ export class SocketService {
         });
     }
 
-    public broadcastOrderAssignment(
-        pharmacyId: number, 
-        orderId: number, 
-        droneId: number, 
-        orderLat?: number, 
-        orderLon?: number, 
-        pharmacyLat?: number, 
-        pharmacyLon?: number
-    ) {
-        const roomName = `pharmacy_${pharmacyId}`;
-        this.io.to(roomName).emit('order:assigned', {
-            orderId,
-            droneId,
-            pharmacyId,
-            orderLat,
-            orderLon,
-            pharmacyLat,
-            pharmacyLon
-        });
-        console.log(`Broadcasted order ${orderId} assigned to drone ${droneId} in room ${roomName} with coordinates`);
+    public broadcastOrderAssignment(delivery: DroneDelivery) {
+        const roomName = `pharmacy_${delivery.pharmacyId}`;
+        this.io.to(roomName).emit('order:assigned', delivery);
+        console.log(`Broadcasted order ${delivery.orderId} assigned to drone ${delivery.droneId} in room ${roomName}`);
     }
 }
