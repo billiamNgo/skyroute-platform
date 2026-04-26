@@ -21,7 +21,7 @@ describe('Order Routes Integration', () => {
         const mockSocketService = {
             broadcastOrderAssignment: jest.fn(),
         } as any;
-        app.use('/orders', orderRoutes(mockSecurity, mockSocketService));
+        app.use('/orders', orderRoutes(mockSecurity));
     });
 
     it('GET /orders should trigger security and return 200', async () => {
