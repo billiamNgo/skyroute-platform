@@ -49,4 +49,14 @@ export async function updateDroneStatus(droneId: number, status: string) {
   return data;
 }
 
+export async function getActiveDroneOrder(droneId: number) {
+  const res = await fetch(`${API_BASE}/drones/${droneId}/active-order`, {
+    headers: buildHeaders(),
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Failed to fetch active order');
+  return data;
+}
+
 export type { Drone };

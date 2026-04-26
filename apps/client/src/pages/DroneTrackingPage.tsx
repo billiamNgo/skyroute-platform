@@ -30,6 +30,7 @@ L.Icon.Default.mergeOptions({
 type Tracking = {
   drone: any;
   lastLocation: { latitude: number; longitude: number } | null;
+  destination: { latitude: number; longitude: number } | null;
 };
 
 // We'll use CircleMarker for colored pins (red for drones, blue for delivery)
@@ -40,7 +41,6 @@ export default function DroneTrackingPage() {
   const [tracking, setTracking] = useState<Tracking | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [deliveryLoc, setDeliveryLoc] = useState<[number, number] | null>(null);
 
   useEffect(() => {
     let socket: Socket | null = null;
@@ -52,18 +52,23 @@ export default function DroneTrackingPage() {
 
       try {
         const data = await getDroneTracking(Number(id));
-        setTracking(data as Tracking);
-        // If drone is already on a mission, fetch the active order destination
-        if (data?.drone?.currentStatus === 'IN_TRANSIT') {
-          try {
-            const orderData = await getActiveDroneOrder(Number(id)); // you'll need this util
-            if (orderData?.destinationLat && orderData?.destinationLon) {
-              setDeliveryLoc([orderData.destinationLat, orderData.destinationLon]);
-            }
-          } catch (err) {
-            console.warn('Could not fetch active order destination', err);
+        // Normalize into our Tracking shape; data includes destinationLat/destinationLon if drone is in transit
+        const initial: Tracking = {
+          drone: (data as any).drone || data,
+          lastLocation: (data as any).lastLocation || null,
+          destination: null,
+        };
+
+        // If the data includes destination coordinates from server, use them
+        if (typeof (data as any).destinationLat === 'number' && typeof (data as any).destinationLon === 'number') {
+          const nLat = Number((data as any).destinationLat);
+          const nLon = Number((data as any).destinationLon);
+          if (!isNaN(nLat) && !isNaN(nLon)) {
+            initial.destination = { latitude: nLat, longitude: nLon };
           }
         }
+
+        setTracking(initial);
 
         const token = localStorage.getItem('token');
         socket = io((import.meta as any).env?.VITE_API_URL || 'http://localhost:8080', {
@@ -79,12 +84,19 @@ export default function DroneTrackingPage() {
           setTracking(prev => prev ? { ...prev, lastLocation: { latitude: payload.latitude, longitude: payload.longitude } } : prev);
         });
 
-        socket.on('order:assigned', (payload: { orderId: number; droneId: number; pharmacyId: number; originLat?: number; originLon?: number; destinationLat?: number; destinationLon?: number }) => {
-          // If this assignment is for our drone, set the delivery coordinates from payload
-          if (Number(id) === payload.droneId) {
-            console.log('Order assigned to this drone', payload.orderId);
-            if (payload.destinationLat && payload.destinationLon) {
-              setDeliveryLoc([payload.destinationLat, payload.destinationLon]);
+        socket.on('order:assigned', (payload: any) => {
+          // Accept multiple naming variants and treat 0 as valid
+          if (Number(id) !== payload?.droneId) return;
+          console.log('Order assigned to this drone', payload?.orderId);
+
+          const destLat = payload?.destinationLat ?? payload?.destination_lat ?? payload?.destinationLatitude ?? payload?.destLat;
+          const destLon = payload?.destinationLon ?? payload?.destination_lon ?? payload?.destinationLongitude ?? payload?.destLon;
+
+          if (typeof destLat !== 'undefined' && typeof destLon !== 'undefined') {
+            const nLat = Number(destLat);
+            const nLon = Number(destLon);
+            if (!isNaN(nLat) && !isNaN(nLon)) {
+              setTracking(prev => prev ? { ...prev, destination: { latitude: nLat, longitude: nLon } } : prev);
             }
           }
         });
@@ -116,8 +128,18 @@ export default function DroneTrackingPage() {
     ? [tracking.lastLocation.latitude, tracking.lastLocation.longitude]
     : [30.4383, -84.2807];
 
-  // Use delivery location from state when available, otherwise a small mock offset for demo
-  const displayDeliveryLoc = deliveryLoc ?? [droneLoc[0] + 0.005, droneLoc[1] + 0.005];
+  // Delivery location from tracking state
+  const displayDeliveryLoc = tracking.destination
+    ? [tracking.destination.latitude, tracking.destination.longitude]
+    : [droneLoc[0] + 0.005, droneLoc[1] + 0.005];
+
+  // react-leaflet typings vary; cast to any to bypass version issues
+  const mapProps: any = { center: droneLoc as [number, number], zoom: 13, style: { height: '100%', width: '100%' } };
+  const tileProps: any = {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+  };
+  const AnyCircleMarker: any = CircleMarker;
 
   return (
     <div className="dashboard-page">
@@ -129,26 +151,23 @@ export default function DroneTrackingPage() {
         <h1 className="dashboard-title">Drone Tracking - {id}</h1>
 
         <div style={{ height: '70vh', width: '100%' }}>
-          <MapContainer center={droneLoc as [number, number]} zoom={13} style={{ height: '100%', width: '100%' }}>
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
+          <MapContainer {...mapProps}>
+            <TileLayer {...tileProps} />
 
             <MapUpdater center={droneLoc as [number, number]} />
 
-            <CircleMarker 
-              key={`${droneLoc[0]}-${droneLoc[1]}`}  // ← forces re-render on position change
-              center={droneLoc as [number, number]} 
-              pathOptions={{ color: 'red', fillColor: 'red' }} 
+            <AnyCircleMarker
+              key={`${droneLoc[0]}-${droneLoc[1]}`}  // forces re-render on position change
+              center={droneLoc as [number, number]}
+              pathOptions={{ color: 'red', fillColor: 'red' }}
               radius={8}
             >
               <Popup>Drone current location</Popup>
-            </CircleMarker>
+            </AnyCircleMarker>
 
-            <CircleMarker center={displayDeliveryLoc as [number, number]} pathOptions={{ color: 'blue', fillColor: 'blue' }} radius={8}>
-              <Popup>Delivery destination (mock)</Popup>
-            </CircleMarker>
+            <AnyCircleMarker center={displayDeliveryLoc as [number, number]} pathOptions={{ color: 'blue', fillColor: 'blue' }} radius={8}>
+              <Popup>Delivery destination</Popup>
+            </AnyCircleMarker>
           </MapContainer>
         </div>
       </div>
