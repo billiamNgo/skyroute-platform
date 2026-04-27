@@ -13,6 +13,7 @@ import DroneManagementPage from "./pages/DroneManagementPage";
 import CustomerTracking from "./pages/CustomerTracking";
 import DroneDetailsPage from "./pages/DroneDetailsPage";
 import DroneTrackingPage from "./pages/DroneTrackingPage";
+import FleetTrackingPage from "./pages/FleetTrackingPage";
 
 function App() {
   return (
@@ -91,6 +92,16 @@ function App() {
             <ProtectedRoute
               allowedRole="technician"
               component={<DroneManagementPage />}
+            />
+          }
+        />
+
+        <Route
+          path="/fleet/track"
+          element={
+            <ProtectedRoute
+              allowedRole="technician"
+              component={<FleetTrackingPage />}
             />
           }
         />

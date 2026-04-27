@@ -228,7 +228,7 @@ export default function OrdersPage() {
                         </button>
                         <button
                             className="orders-tab"
-                            onClick={() => navigate("/technician")}
+                            onClick={() => navigate("/fleet/track")}
                         >
                             Tracking
                         </button>

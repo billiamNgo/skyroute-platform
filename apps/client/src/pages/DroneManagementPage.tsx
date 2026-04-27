@@ -61,17 +61,12 @@ export default function DroneManagementPage() {
 
             <button
               className="orders-tab"
-              onClick={() => navigate("/tracking")}
+              onClick={() => navigate("/fleet/track")}
             >
               Tracking
             </button>
-            
-            <button
-              className="orders-tab"
-              onClick={() => navigate("/notifications")}
-            >
-              Notifications
-            </button>
+
+            <NotificationsBell />
           </div>
 
           <button

@@ -37,6 +37,16 @@ export async function getDroneTracking(droneId: number) {
   return data;
 }
 
+export async function getFleetTracking() {
+  const res = await fetch(`${API_BASE}/drones/tracking/fleet`, {
+    headers: buildHeaders(),
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Failed to fetch fleet tracking data');
+  return data;
+}
+
 export async function updateDroneStatus(droneId: number, status: string) {
   const res = await fetch(`${API_BASE}/drones/${droneId}/status`, {
     method: 'POST',
