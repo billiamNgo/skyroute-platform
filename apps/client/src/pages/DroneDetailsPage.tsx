@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 import "./DroneManagementPage.css";
 import NotificationsBell from "../components/NotificationsBell";
+import StaffHeader from "../components/StaffHeader";
 
 type Drone = { 
     droneID: number;
@@ -59,23 +60,7 @@ export default function DroneDetailsPage() {
     return (
         <div className="dashboard-page">
             <div className="dashboard-container orders-page-container">
-                <div className="orders-topbar">
-                    <button
-                        className="orders-tab"
-                        onClick={() => navigate("/fleet")}
-                    >
-                        Back
-                    </button>
-
-                    <div className="orders-nav">
-                        <button className="orders-tab" onClick={() => navigate("/orders")}>Orders</button>
-                        <button className="orders-tab active-tab" onClick={() => navigate("/fleet")}>Drones</button>
-                        <button className="orders-tab" onClick={() => navigate("/fleet/track")}>Tracking</button>
-                        <NotificationsBell />
-                    </div>
-
-                    <button className="dashboard-danger-button" onClick={() => navigate('/login')}>Logout</button>
-                </div>
+                <StaffHeader activeTab="fleet" />
 
                 <div className="drone-details-header" style={{ marginTop: '20px' }}>
                     <h1 className="dashboard-title">Drone #{droneId} Details</h1>

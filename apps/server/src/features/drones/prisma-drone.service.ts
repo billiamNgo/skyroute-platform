@@ -24,10 +24,11 @@ export class PrismaDroneService implements DroneService {
         }) as Drone[];
     }
 
-    async getDroneTrackingData(droneId: number, pharmacyId: number): Promise<{ drone: Drone; lastLocation: DroneLocation | null; destinationLat?: number; destinationLon?: number }> {
+    async getDroneTrackingData(droneId: number, pharmacyId: number): Promise<{ drone: Drone; lastLocation: DroneLocation | null; destinationLat?: number; destinationLon?: number; pharmacyLocation?: { latitude: number; longitude: number } }> {
         // 1. Get the drone
         const drone = await this.prisma.drones.findUnique({
-            where: { droneID: droneId }
+            where: { droneID: droneId },
+            include: { pharmacy: true }
         });
 
         if (!drone || drone.pharmacyID !== pharmacyId) {
@@ -41,8 +42,9 @@ export class PrismaDroneService implements DroneService {
         });
 
         const result: any = {
-            drone: drone as Drone,
-            lastLocation: lastLocation as DroneLocation | null
+            drone: drone as unknown as Drone,
+            lastLocation: lastLocation as DroneLocation | null,
+            pharmacyLocation: await this.geocoding.geocode(drone.pharmacy.address, drone.pharmacy.city, drone.pharmacy.state)
         };
 
         // 3. If the drone is IN_TRANSIT, we might have a destination from the last order assigned to it

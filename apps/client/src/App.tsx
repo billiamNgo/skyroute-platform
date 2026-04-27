@@ -39,7 +39,7 @@ function App() {
           path="/orders"
           element={
             <ProtectedRoute
-              allowedRole="technician"
+              allowedRole={["technician", "pharmacist"]}
               component={<OrdersPage />}
             />
           }
@@ -55,25 +55,6 @@ function App() {
           }
         />
 
-        <Route 
-          path="/pharmacist/orders" 
-          element={
-            <ProtectedRoute 
-              allowedRole="pharmacist"
-              component={<PharmacistOrdersPage />}
-            />
-          }
-        />
-
-        <Route
-          path="/pharmacist/drones"
-          element={
-            <ProtectedRoute
-              allowedRole="pharmacist"
-              component={<PharmacistDronesPage />}
-            />
-          }
-        />
 
         <Route 
           path="/admin" 
@@ -89,7 +70,7 @@ function App() {
           path="/fleet"
           element={
             <ProtectedRoute
-              allowedRole="technician"
+              allowedRole={["technician", "pharmacist"]}
               component={<DroneManagementPage />}
             />
           }
@@ -99,7 +80,7 @@ function App() {
           path="/fleet/track"
           element={
             <ProtectedRoute
-              allowedRole="technician"
+              allowedRole={["technician", "pharmacist"]}
               component={<FleetTrackingPage />}
             />
           }
@@ -109,7 +90,7 @@ function App() {
           path="/fleet/track/:id"
           element={
             <ProtectedRoute
-              allowedRole="technician"
+              allowedRole={["technician", "pharmacist"]}
               component={<DroneTrackingPage />}
             />
           }
@@ -119,7 +100,7 @@ function App() {
           path="/fleet/:droneId"
           element={
             <ProtectedRoute
-              allowedRole="technician"
+              allowedRole={["technician", "pharmacist"]}
               component={<DroneDetailsPage />}
             />
           }

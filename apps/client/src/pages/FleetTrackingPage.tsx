@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getFleetTracking } from '../utils/drones';
 import './DroneManagementPage.css';
 import NotificationsBell from "../components/NotificationsBell";
+import StaffHeader from "../components/StaffHeader";
 
 import { MapContainer, TileLayer, Popup, CircleMarker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -104,18 +105,7 @@ export default function FleetTrackingPage() {
   return (
     <div className="dashboard-page">
       <div className="dashboard-container orders-page-container">
-        <div className="orders-topbar">
-          <button className="orders-tab" onClick={() => navigate('/technician')}>Back</button>
-          
-          <div className="orders-nav">
-             <button className="orders-tab" onClick={() => navigate("/orders")}>Orders</button>
-             <button className="orders-tab" onClick={() => navigate("/fleet")}>Drones</button>
-             <button className="orders-tab active-tab">Tracking</button>
-             <NotificationsBell />
-          </div>
-
-          <button className="dashboard-danger-button" onClick={() => navigate('/login')}>Logout</button>
-        </div>
+        <StaffHeader activeTab="tracking" />
 
         <h1 className="dashboard-title">Fleet Live Tracking</h1>
         <p className="dashboard-subtitle">Real-time view of all drones in the pharmacy fleet.</p>
