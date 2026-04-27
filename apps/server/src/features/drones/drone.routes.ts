@@ -16,6 +16,13 @@ export default function droneRoutes(security: any) {
         controller.getAllDrones
     );
 
+    // GET /drones/:id
+    router.get('/:id',
+        security.authenticateJWT,
+        security.isStaff,
+        controller.getDrone
+    );
+
     // GET /drones/tracking/fleet
     router.get('/tracking/fleet',
         security.authenticateJWT,

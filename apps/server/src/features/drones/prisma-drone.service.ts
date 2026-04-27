@@ -25,51 +25,39 @@ export class PrismaDroneService implements DroneService {
     }
 
     async getDroneTrackingData(droneId: number, pharmacyId: number): Promise<{ drone: Drone; lastLocation: DroneLocation | null; destinationLat?: number; destinationLon?: number }> {
+        // 1. Get the drone
         const drone = await this.prisma.drones.findUnique({
-            where: { droneID: droneId },
-            include: {
-                locations: {
-                    orderBy: { reportedAt: 'desc' },
-                    take: 1
-                }
-            }
+            where: { droneID: droneId }
         });
 
-        if (!drone) {
-            throw createError(404, `Drone ${droneId} not found`);
-        }
-        // Check drone belongs to pharmacy if pharmacyId provided
-        if (pharmacyId !== undefined && drone.pharmacyID !== pharmacyId) {
-            throw createError(403, 'Forbidden: Drone does not belong to your pharmacy');
+        if (!drone || drone.pharmacyID !== pharmacyId) {
+            throw createError(404, 'Drone not found');
         }
 
-        const { locations, ...droneData } = drone;
+        // 2. Get the last location
+        const lastLocation = await this.prisma.droneLocation.findFirst({
+            where: { droneID: droneId },
+            orderBy: { reportedAt: 'desc' }
+        });
+
         const result: any = {
-            drone: droneData as Drone,
-            lastLocation: locations[0] as DroneLocation || null
+            drone: drone as Drone,
+            lastLocation: lastLocation as DroneLocation | null
         };
 
-        // If drone has an active order, fetch and geocode the destination
-        if (drone.currentStatus === 'IN_TRANSIT' && drone.droneID) {
-            const activeOrder = await this.prisma.orders.findFirst({
-                where: {
-                    droneID: droneId,
-                    status: 'IN_TRANSIT'
-                }
+        // 3. If the drone is IN_TRANSIT, we might have a destination from the last order assigned to it
+        if (drone.currentStatus === 'IN_TRANSIT') {
+            const order = await this.prisma.orders.findFirst({
+                where: { droneID: droneId, status: 'IN_TRANSIT' },
+                include: { pharmacy: true }
             });
 
-            if (activeOrder) {
-                try {
-                    const destCoords = await this.geocoding.geocode(
-                        activeOrder.address,
-                        activeOrder.city,
-                        activeOrder.state
-                    );
-                    result.destinationLat = destCoords.latitude;
-                    result.destinationLon = destCoords.longitude;
-                } catch (err) {
-                    console.warn(`[DroneService] Could not geocode destination for order ${activeOrder.orderID}:`, err);
-                }
+            if (order) {
+                // We'll geocode the destination on the fly for the MVP
+                // In a production app, we should store lat/lon on the order record
+                const coords = await this.geocoding.geocode(order.address, order.city, order.state);
+                result.destinationLat = coords.latitude;
+                result.destinationLon = coords.longitude;
             }
         }
 
@@ -104,15 +92,24 @@ export class PrismaDroneService implements DroneService {
         });
     }
 
+    async getDroneById(droneId: number): Promise<Drone | null> {
+        const drone = await this.prisma.drones.findUnique({
+            where: { droneID: droneId }
+        });
+        return drone as Drone | null;
+    }
+
     async updateDroneStatus(droneId: number, status: string): Promise<Drone> {
         const drone = await this.prisma.drones.findUnique({ where: { droneID: droneId } });
         if (!drone) {
-            throw createError(404, `Drone ${droneId} not found`);
+            throw createError(404, 'Drone not found');
         }
 
-        return await this.prisma.drones.update({
+        const updated = await this.prisma.drones.update({
             where: { droneID: droneId },
             data: { currentStatus: status }
-        }) as unknown as Drone;
+        });
+
+        return updated as Drone;
     }
 }

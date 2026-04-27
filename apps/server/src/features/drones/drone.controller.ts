@@ -35,6 +35,19 @@ export class DroneController {
         }
     };
 
+    getDrone = async (req: Request, res: Response) => {
+        try {
+            const droneId = Number(req.params.id);
+            const drone = await this.droneService.getDroneById(droneId);
+            if (!drone) {
+                return res.status(404).json({ message: 'Drone not found' });
+            }
+            return res.json(drone);
+        } catch (error: any) {
+            return res.status(error.status || 500).json({ message: error.message || 'Internal server error' });
+        }
+    };
+
     updateStatus = async (req: Request, res: Response) => {
         try {
             const droneId = Number(req.params.id);
