@@ -25,6 +25,16 @@ export class DroneController {
         }
     };
 
+    trackFleet = async (req: Request, res: Response) => {
+        try {
+            const pharmacyId = Number(req.user.pharmacyId);
+            const tracking = await this.droneService.getFleetTrackingData(pharmacyId);
+            return res.json(tracking);
+        } catch (error: any) {
+            return res.status(error.status || 500).json({ message: error.message || 'Internal server error' });
+        }
+    };
+
     updateStatus = async (req: Request, res: Response) => {
         try {
             const droneId = Number(req.params.id);
