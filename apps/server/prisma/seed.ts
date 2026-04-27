@@ -165,7 +165,7 @@ async function main() {
       {
         firstName: 'Sarah',
         lastName: 'Johnson',
-        address: '5400 Berryhill Rd',
+        address: '3444 Riverhill Drive',
         medication: 'Lisinopril',
       },
       {

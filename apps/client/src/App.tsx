@@ -94,6 +94,16 @@ function App() {
           }
         />
 
+        <Route
+          path="/fleet/track/:id"
+          element={
+            <ProtectedRoute
+              allowedRole="technician"
+              component={<DroneTrackingPage />}
+            />
+          }
+        />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

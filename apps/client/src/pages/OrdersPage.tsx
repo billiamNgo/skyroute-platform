@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../utils/auth";
 import OrdersList from "../components/OrdersList";
+import NotificationsBell from "../components/NotificationsBell";
 import "./OrdersPage.css";
 import "./Dashboard.css"
 
@@ -231,12 +232,7 @@ export default function OrdersPage() {
                         >
                             Tracking
                         </button>
-                        <button
-                            className="orders-tab"
-                            onClick={() => navigate("/technician")}
-                        >
-                            Notifications
-                            </button>
+                            <NotificationsBell />
                         </div>
 
                         <button className="dashboard-danger-button" onClick={handleLogout}>

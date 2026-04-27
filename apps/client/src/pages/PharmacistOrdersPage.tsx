@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../utils/auth";
 import OrdersList from "../components/OrdersList";
+import NotificationsBell from "../components/NotificationsBell";
 import "./Dashboard.css";
 import "./OrdersPage.css";
 
@@ -219,7 +220,9 @@ export default function PharmacistOrdersPage() {
           >
             Back
           </button>
-
+          
+          <NotificationsBell />
+          
           <button
             className="dashboard-danger-button"
             onClick={handleLogout}

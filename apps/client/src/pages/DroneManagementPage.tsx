@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../utils/auth";
+import NotificationsBell from "../components/NotificationsBell";
 import "./Dashboard.css";
 import "./OrdersPage.css";
 import "./DroneManagementPage.css";
-
-type Drone = {
-  droneID: number;
-  pharmacyID: number;
-  currentStatus: string;
-};
+import { getDrones, type Drone } from "../utils/drones";
 
 export default function DroneManagementPage() {
   const navigate = useNavigate();
@@ -27,31 +23,7 @@ export default function DroneManagementPage() {
       setError(null);
 
       try {
-        const res = await fetch("http://localhost:8080/drones", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        const text = await res.text();
-        let data;
-
-        try {
-          data = JSON.parse(text);
-        } catch {
-          console.error("Raw response from /drones:", text);
-          throw new Error("Failed to parse response from server. See console for details.");
-        }
-
-        if (!res.ok) {
-          throw new Error(data.message || "Failed to load drones");
-        }
-
-        if (!Array.isArray(data)) {
-          throw new Error("API did not return an array of drones");
-        }
-
+        const data = await getDrones();
         setDrones(data);
       } catch (err: any) {
         setError(err.message || "Unknown error");
