@@ -13,6 +13,7 @@ import DroneManagementPage from "./pages/DroneManagementPage";
 import CustomerTracking from "./pages/CustomerTracking";
 import DroneDetailsPage from "./pages/DroneDetailsPage";
 import DroneTrackingPage from "./pages/DroneTrackingPage";
+import FleetTrackingPage from "./pages/FleetTrackingPage";
 
 function App() {
   return (
@@ -23,7 +24,6 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/tracking" element={<CustomerTracking />} />
         <Route path="/tracking/:orderId" element={<CustomerTracking />} />
-        <Route path="/fleet/:droneId" element={<DroneDetailsPage />} />
 
         <Route 
           path="/technician" 
@@ -39,7 +39,7 @@ function App() {
           path="/orders"
           element={
             <ProtectedRoute
-              allowedRole="technician"
+              allowedRole={["technician", "pharmacist"]}
               component={<OrdersPage />}
             />
           }
@@ -55,25 +55,6 @@ function App() {
           }
         />
 
-        <Route 
-          path="/pharmacist/orders" 
-          element={
-            <ProtectedRoute 
-              allowedRole="pharmacist"
-              component={<PharmacistOrdersPage />}
-            />
-          }
-        />
-
-        <Route
-          path="/pharmacist/drones"
-          element={
-            <ProtectedRoute
-              allowedRole="pharmacist"
-              component={<PharmacistDronesPage />}
-            />
-          }
-        />
 
         <Route 
           path="/admin" 
@@ -89,8 +70,18 @@ function App() {
           path="/fleet"
           element={
             <ProtectedRoute
-              allowedRole="technician"
+              allowedRole={["technician", "pharmacist"]}
               component={<DroneManagementPage />}
+            />
+          }
+        />
+
+        <Route
+          path="/fleet/track"
+          element={
+            <ProtectedRoute
+              allowedRole={["technician", "pharmacist"]}
+              component={<FleetTrackingPage />}
             />
           }
         />
@@ -99,8 +90,18 @@ function App() {
           path="/fleet/track/:id"
           element={
             <ProtectedRoute
-              allowedRole="technician"
+              allowedRole={["technician", "pharmacist"]}
               component={<DroneTrackingPage />}
+            />
+          }
+        />
+
+        <Route
+          path="/fleet/:droneId"
+          element={
+            <ProtectedRoute
+              allowedRole={["technician", "pharmacist"]}
+              component={<DroneDetailsPage />}
             />
           }
         />

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../utils/auth";
 import NotificationsBell from "../components/NotificationsBell";
+import StaffHeader from "../components/StaffHeader";
 import "./Dashboard.css";
 import "./OrdersPage.css";
 import "./DroneManagementPage.css";
@@ -38,49 +39,7 @@ export default function DroneManagementPage() {
   return (
     <div className="dashboard-page">
       <div className="dashboard-container orders-page-container">
-        <div className="orders-topbar">
-          <button
-            className="orders-tab"
-            onClick={() => navigate("/technician")}
-          >
-            Back
-          </button>
-
-          <div className="orders-nav">
-            <button
-              className="orders-tab"
-              onClick={() => navigate("/orders")}
-            >
-              Orders
-            </button>
-
-            <button 
-              className="orders-tab active-tab">
-              Drones
-            </button>
-
-            <button
-              className="orders-tab"
-              onClick={() => navigate("/tracking")}
-            >
-              Tracking
-            </button>
-            
-            <button
-              className="orders-tab"
-              onClick={() => navigate("/notifications")}
-            >
-              Notifications
-            </button>
-          </div>
-
-          <button
-            className="dashboard-danger-button"
-            onClick={handleLogout}
-          >
-            Logout
-          </button>
-        </div>
+        <StaffHeader activeTab="fleet" />
 
         <h1 className="dashboard-title">Drone Management</h1>
 
@@ -100,7 +59,8 @@ export default function DroneManagementPage() {
                   <th>Drone ID</th>
                   <th>Pharmacy ID</th>
                   <th>Status</th>
-                  <th>Details</th>
+                  <th>Battery</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -109,14 +69,42 @@ export default function DroneManagementPage() {
                     <td>{drone.droneID}</td>
                     <td>{drone.pharmacyID}</td>
                     <td>{drone.currentStatus}</td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ 
+                          width: '40px', 
+                          height: '8px', 
+                          backgroundColor: '#e2e8f0', 
+                          borderRadius: '4px', 
+                          overflow: 'hidden' 
+                        }}>
+                          <div style={{ 
+                            width: `${drone.batteryLevel || 0}%`, 
+                            height: '100%', 
+                            backgroundColor: (drone.batteryLevel ?? 0) > 70 ? '#10b981' : (drone.batteryLevel ?? 0) > 20 ? '#f59e0b' : '#ef4444' 
+                          }} />
+                        </div>
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{drone.batteryLevel}%</span>
+                      </div>
+                    </td>
 
                     <td>
-                      <button
-                        onClick={() => navigate(`/fleet/${drone.droneID}`)}
-                        className="orders-tab"
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          onClick={() => navigate(`/fleet/${drone.droneID}`)}
+                          className="orders-tab"
+                          style={{ minWidth: '70px', padding: '6px 12px' }}
                         >
                           View
                         </button>
+                        <button
+                          onClick={() => navigate(`/fleet/track/${drone.droneID}`)}
+                          className="orders-tab"
+                          style={{ minWidth: '70px', padding: '6px 12px' }}
+                        >
+                          Track
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

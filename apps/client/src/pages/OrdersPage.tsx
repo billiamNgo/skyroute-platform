@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../utils/auth";
 import OrdersList from "../components/OrdersList";
 import NotificationsBell from "../components/NotificationsBell";
+import StaffHeader from "../components/StaffHeader";
 import "./OrdersPage.css";
 import "./Dashboard.css"
 
@@ -210,35 +211,7 @@ export default function OrdersPage() {
     return (
         <div className="dashboard-page">
             <div className="dashboard-container orders-page-container">
-                <div className="orders-topbar">
-                    <button
-                        className="orders-tab"
-                        onClick={() => navigate("/technician")}
-                    >
-                        Back
-                    </button>
-
-                    <div className="orders-nav">
-                        <button className="orders-tab active-tab">Orders</button>
-                        <button
-                            className="orders-tab"
-                            onClick={() => navigate("/fleet")}
-                        >
-                            Drones
-                        </button>
-                        <button
-                            className="orders-tab"
-                            onClick={() => navigate("/technician")}
-                        >
-                            Tracking
-                        </button>
-                            <NotificationsBell />
-                        </div>
-
-                        <button className="dashboard-danger-button" onClick={handleLogout}>
-                            Logout
-                        </button>
-                    </div>
+                <StaffHeader activeTab="orders" />
 
                     <h1 className="dashboard-title">Orders</h1>
 

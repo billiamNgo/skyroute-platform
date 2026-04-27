@@ -51,9 +51,10 @@ export default function TechnicianDashboard() {
           >
             Manage Drones
           </button>
+
           <button
             className="orders-tab"
-            onClick={() => navigate('/fleet')}
+            onClick={() => navigate("/fleet/track")}
           >
             Tracking
           </button>

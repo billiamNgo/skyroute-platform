@@ -2,6 +2,7 @@ type Drone = {
   droneID: number;
   pharmacyID: number;
   currentStatus: string;
+  batteryLevel?: number;
 };
 
 // Vite exposes env via import.meta.env; in TypeScript that may not include custom fields,
@@ -34,6 +35,16 @@ export async function getDroneTracking(droneId: number) {
 
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || 'Failed to fetch tracking data');
+  return data;
+}
+
+export async function getFleetTracking() {
+  const res = await fetch(`${API_BASE}/drones/tracking/fleet`, {
+    headers: buildHeaders(),
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Failed to fetch fleet tracking data');
   return data;
 }
 

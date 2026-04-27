@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getDroneTracking } from '../utils/drones';
 import './DroneManagementPage.css';
+import StaffHeader from '../components/StaffHeader';
 
 import { MapContainer, TileLayer, Popup, CircleMarker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -31,6 +32,7 @@ type Tracking = {
   drone: any;
   lastLocation: { latitude: number; longitude: number } | null;
   destination: { latitude: number; longitude: number } | null;
+  pharmacyLocation: { latitude: number; longitude: number } | null;
 };
 
 // We'll use CircleMarker for colored pins (red for drones, blue for delivery)
@@ -57,6 +59,7 @@ export default function DroneTrackingPage() {
           drone: (data as any).drone || data,
           lastLocation: (data as any).lastLocation || null,
           destination: null,
+          pharmacyLocation: (data as any).pharmacyLocation || null,
         };
 
         // If the data includes destination coordinates from server, use them
@@ -123,15 +126,13 @@ export default function DroneTrackingPage() {
   if (error) return <div className="drone-error">{error}</div>;
   if (!tracking) return <div>No tracking data available.</div>;
 
-  // Drone location
-  const droneLoc = tracking.lastLocation
+  // Drone location fallback: lastLocation -> pharmacyLocation -> Pensacola default
+  const defaultPensacola: [number, number] = [30.54, -87.21];
+  const droneLoc: [number, number] = tracking.lastLocation
     ? [tracking.lastLocation.latitude, tracking.lastLocation.longitude]
-    : [30.4383, -84.2807];
-
-  // Delivery location from tracking state
-  const displayDeliveryLoc = tracking.destination
-    ? [tracking.destination.latitude, tracking.destination.longitude]
-    : [droneLoc[0] + 0.005, droneLoc[1] + 0.005];
+    : tracking.pharmacyLocation
+    ? [tracking.pharmacyLocation.latitude, tracking.pharmacyLocation.longitude]
+    : defaultPensacola;
 
   // react-leaflet typings vary; cast to any to bypass version issues
   const mapProps: any = { center: droneLoc as [number, number], zoom: 13, style: { height: '100%', width: '100%' } };
@@ -144,9 +145,7 @@ export default function DroneTrackingPage() {
   return (
     <div className="dashboard-page">
       <div className="dashboard-container orders-page-container">
-        <div className="orders-topbar">
-          <button className="orders-tab" onClick={() => navigate('/technician')}>Back</button>
-        </div>
+        <StaffHeader activeTab="tracking" />
 
         <h1 className="dashboard-title">Drone Tracking - {id}</h1>
 
@@ -165,9 +164,15 @@ export default function DroneTrackingPage() {
               <Popup>Drone current location</Popup>
             </AnyCircleMarker>
 
-            <AnyCircleMarker center={displayDeliveryLoc as [number, number]} pathOptions={{ color: 'blue', fillColor: 'blue' }} radius={8}>
-              <Popup>Delivery destination</Popup>
-            </AnyCircleMarker>
+            {tracking.destination && (
+              <AnyCircleMarker 
+                center={[tracking.destination.latitude, tracking.destination.longitude] as [number, number]} 
+                pathOptions={{ color: 'blue', fillColor: 'blue' }} 
+                radius={8}
+              >
+                <Popup>Delivery destination</Popup>
+              </AnyCircleMarker>
+            )}
           </MapContainer>
         </div>
       </div>

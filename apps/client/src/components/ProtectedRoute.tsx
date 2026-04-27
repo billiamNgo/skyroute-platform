@@ -4,7 +4,7 @@ import type { ReactElement } from "react";
 
 type ProtectedRouteProps = { 
     component: ReactElement;
-    allowedRole: "admin" | "pharmacist" | "technician";
+    allowedRole: string | string[];
 };
 
 export default function ProtectedRoute({
@@ -14,7 +14,12 @@ export default function ProtectedRoute({
     const token = getToken();
     const role = getRole(); 
 
-    if (!token || role !== allowedRole) { 
+    if (!token) { 
+        return <Navigate to="/" replace />
+    }
+
+    const roles = Array.isArray(allowedRole) ? allowedRole : [allowedRole];
+    if (!roles.includes(role as string)) {
         return <Navigate to="/" replace />
     }
 
