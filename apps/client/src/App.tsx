@@ -24,7 +24,6 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/tracking" element={<CustomerTracking />} />
         <Route path="/tracking/:orderId" element={<CustomerTracking />} />
-        <Route path="/fleet/:droneId" element={<DroneDetailsPage />} />
 
         <Route 
           path="/technician" 
@@ -112,6 +111,16 @@ function App() {
             <ProtectedRoute
               allowedRole="technician"
               component={<DroneTrackingPage />}
+            />
+          }
+        />
+
+        <Route
+          path="/fleet/:droneId"
+          element={
+            <ProtectedRoute
+              allowedRole="technician"
+              component={<DroneDetailsPage />}
             />
           }
         />

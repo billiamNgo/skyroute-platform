@@ -2,6 +2,7 @@ type Drone = {
   droneID: number;
   pharmacyID: number;
   currentStatus: string;
+  batteryLevel?: number;
 };
 
 // Vite exposes env via import.meta.env; in TypeScript that may not include custom fields,
