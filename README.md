@@ -85,3 +85,11 @@ Development Checkpoint 2 Demo Video:
 ```
 https://drive.google.com/file/d/1BTRljRbTGgiH9rrAVyBe-ALypK0dl1Em/view?usp=sharing
 ```
+Technical Documentation Video: 
+```
+https://drive.google.com/file/d/1kSIEa2Upg3aH6rNtSOAM5hkwb90Dzw0m/view?usp=sharing
+```
+User Documentation Video:
+```
+```
+
