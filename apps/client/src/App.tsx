@@ -12,6 +12,7 @@ import OrdersPage from "./pages/OrdersPage";
 import DroneManagementPage from "./pages/DroneManagementPage";
 import CustomerTracking from "./pages/CustomerTracking";
 import DroneDetailsPage from "./pages/DroneDetailsPage";
+import DroneTrackingPage from "./pages/DroneTrackingPage";
 
 function App() {
   return (
