@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../utils/auth";
+import NotificationsBell from "../components/NotificationsBell";
 import "./Dashboard.css";
 import "./OrdersPage.css";
 import "./DroneManagementPage.css";
@@ -59,12 +60,7 @@ export default function DroneManagementPage() {
             >
               Tracking
             </button>
-            <button
-              className="orders-tab"
-              onClick={() => navigate("/technician")}
-            >
-              Notifications
-            </button>
+              <NotificationsBell />
           </div>
 
           <button
