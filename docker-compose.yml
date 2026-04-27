@@ -12,7 +12,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     command: sh -c "npx prisma migrate dev --name init && npx prisma db seed && npm start"
+
 
   client:
     build:
@@ -21,7 +28,9 @@ services:
     ports:
       - "5173:5173"
     depends_on:
-      - server
+      server:
+        condition: service_healthy
+
     environment:
       - VITE_API_URL=http://localhost:8080
 
@@ -45,3 +54,138 @@ services:
     restart: always
     ports:
       - 8081:8080
+
+  drone-sim-1:
+    build:
+      context: ./apps/drone-sim
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_URL=http://server:8080
+      - SIM_DRONE_ID=1
+      - SIM_PHARMACY_ID=1
+      - SIM_USER_EMAIL=drones@publix.com
+      - SIM_USER_PASSWORD=ChangeMe!23
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: on-failure
+
+  drone-sim-2:
+    build:
+      context: ./apps/drone-sim
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_URL=http://server:8080
+      - SIM_DRONE_ID=2
+      - SIM_PHARMACY_ID=1
+      - SIM_USER_EMAIL=drones@publix.com
+      - SIM_USER_PASSWORD=ChangeMe!23
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: on-failure
+
+  drone-sim-3:
+    build:
+      context: ./apps/drone-sim
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_URL=http://server:8080
+      - SIM_DRONE_ID=3
+      - SIM_PHARMACY_ID=1
+      - SIM_USER_EMAIL=drones@publix.com
+      - SIM_USER_PASSWORD=ChangeMe!23
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: on-failure
+
+  drone-sim-4:
+    build:
+      context: ./apps/drone-sim
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_URL=http://server:8080
+      - SIM_DRONE_ID=4
+      - SIM_PHARMACY_ID=2
+      - SIM_USER_EMAIL=drones@cvs.com
+      - SIM_USER_PASSWORD=ChangeMe!23
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: on-failure
+
+  drone-sim-5:
+    build:
+      context: ./apps/drone-sim
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_URL=http://server:8080
+      - SIM_DRONE_ID=5
+      - SIM_PHARMACY_ID=2
+      - SIM_USER_EMAIL=drones@cvs.com
+      - SIM_USER_PASSWORD=ChangeMe!23
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: on-failure
+
+  drone-sim-6:
+    build:
+      context: ./apps/drone-sim
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_URL=http://server:8080
+      - SIM_DRONE_ID=6
+      - SIM_PHARMACY_ID=2
+      - SIM_USER_EMAIL=drones@cvs.com
+      - SIM_USER_PASSWORD=ChangeMe!23
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: on-failure
+
+  drone-sim-7:
+    build:
+      context: ./apps/drone-sim
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_URL=http://server:8080
+      - SIM_DRONE_ID=7
+      - SIM_PHARMACY_ID=3
+      - SIM_USER_EMAIL=drones@walgreens.com
+      - SIM_USER_PASSWORD=ChangeMe!23
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: on-failure
+
+  drone-sim-8:
+    build:
+      context: ./apps/drone-sim
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_URL=http://server:8080
+      - SIM_DRONE_ID=8
+      - SIM_PHARMACY_ID=3
+      - SIM_USER_EMAIL=drones@walgreens.com
+      - SIM_USER_PASSWORD=ChangeMe!23
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: on-failure
+
+  drone-sim-9:
+    build:
+      context: ./apps/drone-sim
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_URL=http://server:8080
+      - SIM_DRONE_ID=9
+      - SIM_PHARMACY_ID=3
+      - SIM_USER_EMAIL=drones@walgreens.com
+      - SIM_USER_PASSWORD=ChangeMe!23
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: on-failure

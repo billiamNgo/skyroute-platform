@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { OrderController } from './order.controller';
 import { PrismaOrderService } from './prisma-order.service';
+import { SocketService } from '../realtime/socket.service';
 
 export default function orderRoutes(security: any) {
     const router = Router();

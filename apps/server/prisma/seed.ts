@@ -9,28 +9,28 @@ const prisma = new PrismaClient({ adapter })
 
 
 async function main() {
-  // Define three pharmacies
+  // Define three pharmacies with real addresses
   const pharmacies = [
     {
       name: 'Publix',
-      address: '100 Center St',
-      city: 'Milton',
+      address: '5580 Woodbine Rd',
+      city: 'Pace',
       state: 'FL',
-      zip: 90001,
+      zip: 32571,
     },
     {
       name: 'CVS',
-      address: '200 North Ave',
+      address: '4711 Bayou Blvd',
       city: 'Pensacola',
       state: 'FL',
-      zip: 90002,
+      zip: 32503,
     },
     {
       name: 'Walgreens',
-      address: '300 East Blvd',
-      city: 'Pace',
+      address: '6314 N 9th Ave',
+      city: 'Pensacola',
       state: 'FL',
-      zip: 90003,
+      zip: 32504,
     },
   ];
 
@@ -112,6 +112,28 @@ async function main() {
     });
 
     console.log(`Ensured service account ${serviceUser.email} for pharmacy ${pharmacy.name} with password ${servicePasswordRaw}`);
+
+    // Create drone-specific service account for this pharmacy
+    const droneEmail = 'drones@' + p.name.toLowerCase().replace(/\s+/g, '') + '.com';
+    const droneUser = await prisma.user.upsert({
+      where: { email: droneEmail },
+      create: {
+        email: droneEmail,
+        firstName: `${p.name}-drone`,
+        lastName: 'Fleet',
+        password: hashed,
+        role: 'drone',
+        pharmacyID: pharmacy.pharmacyID,
+      },
+      update: {
+        firstName: `${p.name}-drone`,
+        lastName: 'Fleet',
+        password: hashed,
+        role: 'drone',
+        pharmacyID: pharmacy.pharmacyID,
+      },
+    });
+    console.log(`Ensured drone account ${droneUser.email} for pharmacy ${pharmacy.name} with password ${servicePasswordRaw}`);
   }
 
   // Create drones and orders for each pharmacy
@@ -137,56 +159,56 @@ async function main() {
       {
         firstName: 'John',
         lastName: 'Smith',
-        address: '100 Main St',
+        address: '5634 Woodbine Rd',
         medication: 'Aspirin',
       },
       {
         firstName: 'Sarah',
         lastName: 'Johnson',
-        address: '250 Oak Ave',
+        address: '5400 Berryhill Rd',
         medication: 'Lisinopril',
       },
       {
         firstName: 'Michael',
         lastName: 'Williams',
-        address: '500 Pine Rd',
+        address: '3900 Hwy 90',
         medication: 'Atorvastatin',
       },
       {
         firstName: 'Emily',
         lastName: 'Brown',
-        address: '150 Elm St',
+        address: '4400 Bayou Blvd',
         medication: 'Metformin',
       },
       {
         firstName: 'David',
         lastName: 'Miller',
-        address: '350 Maple Dr',
+        address: '1000 College Blvd',
         medication: 'Amoxicillin',
       },
       {
         firstName: 'Jessica',
         lastName: 'Davis',
-        address: '450 Cedar Ln',
+        address: '6000 N 9th Ave',
         medication: 'Ibuprofen',
       },
       {
         firstName: 'James',
         lastName: 'Garcia',
-        address: '200 Birch Ct',
+        address: '6500 N 9th Ave',
         medication: 'Omeprazole',
       },
       {
         firstName: 'Amanda',
         lastName: 'Martinez',
-        address: '600 Spruce Way',
-        medication: 'Metoprolol',
+        address: '6200 N 9th Ave',
+        medication: 'Losartan',
       },
       {
-        firstName: 'Christopher',
-        lastName: 'Rodriguez',
-        address: '800 Willow Pl',
-        medication: 'Sertraline',
+        firstName: 'Robert',
+        lastName: 'Anderson',
+        address: '4000 Hwy 90',
+        medication: 'Levothyroxine',
       },
     ];
 

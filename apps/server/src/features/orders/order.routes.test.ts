@@ -18,6 +18,9 @@ describe('Order Routes Integration', () => {
     beforeAll(() => {
         app = express();
         app.use(express.json());
+        const mockSocketService = {
+            broadcastOrderAssignment: jest.fn(),
+        } as any;
         app.use('/orders', orderRoutes(mockSecurity));
     });
 

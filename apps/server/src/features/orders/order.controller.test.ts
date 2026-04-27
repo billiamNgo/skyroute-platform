@@ -17,6 +17,10 @@ describe('OrderController', () => {
             assignDrone: jest.fn(),
         } as any;
 
+        const mockSocketService = {
+            broadcastOrderAssignment: jest.fn(),
+        } as any;
+
         controller = new OrderController(mockService);
         jsonMock = jest.fn();
         statusMock = jest.fn().mockReturnValue({ json: jsonMock });
