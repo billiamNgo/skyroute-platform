@@ -53,14 +53,25 @@ export default function DroneManagementPage() {
             >
               Orders
             </button>
-            <button className="orders-tab active-tab">Drones</button>
+
+            <button 
+              className="orders-tab active-tab">
+              Drones
+            </button>
+
             <button
               className="orders-tab"
-              onClick={() => navigate("/technician")}
+              onClick={() => navigate("/tracking")}
             >
               Tracking
             </button>
-              <NotificationsBell />
+            
+            <button
+              className="orders-tab"
+              onClick={() => navigate("/notifications")}
+            >
+              Notifications
+            </button>
           </div>
 
           <button
@@ -89,6 +100,7 @@ export default function DroneManagementPage() {
                   <th>Drone ID</th>
                   <th>Pharmacy ID</th>
                   <th>Status</th>
+                  <th>Details</th>
                 </tr>
               </thead>
               <tbody>
@@ -97,6 +109,15 @@ export default function DroneManagementPage() {
                     <td>{drone.droneID}</td>
                     <td>{drone.pharmacyID}</td>
                     <td>{drone.currentStatus}</td>
+
+                    <td>
+                      <button
+                        onClick={() => navigate(`/fleet/${drone.droneID}`)}
+                        className="orders-tab"
+                        >
+                          View
+                        </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

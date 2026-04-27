@@ -10,7 +10,8 @@ import PharmacistOrdersPage from "./pages/PharmacistOrdersPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import OrdersPage from "./pages/OrdersPage";
 import DroneManagementPage from "./pages/DroneManagementPage";
-import DroneTrackingPage from "./pages/DroneTrackingPage";
+import CustomerTracking from "./pages/CustomerTracking";
+import DroneDetailsPage from "./pages/DroneDetailsPage";
 
 function App() {
   return (
@@ -19,6 +20,9 @@ function App() {
         <Route path="/" element={<Welcome />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/tracking" element={<CustomerTracking />} />
+        <Route path="/tracking/:orderId" element={<CustomerTracking />} />
+        <Route path="/fleet/:droneId" element={<DroneDetailsPage />} />
 
         <Route 
           path="/technician" 

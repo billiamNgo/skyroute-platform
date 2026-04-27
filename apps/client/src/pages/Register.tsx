@@ -177,6 +177,9 @@ export default function Register() {
         <div className="auth-link-row">
           Already have an account? <Link to="/login">Back to Login</Link>
         </div>
+        <div className="auth-link-row">
+          Want to go back? <Link to="/"> Back to Home</Link>
+        </div>
       </div>
     </div>
   );
