@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { logoutUser } from "../utils/auth";
+import { logoutUser, API_BASE } from "../utils/auth";
 import "./Dashboard.css";
 
 export default function AdminDashboard() {
@@ -15,7 +15,7 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    fetch("/users/profile", {
+    fetch(`${API_BASE}/users/profile`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -26,7 +26,7 @@ export default function AdminDashboard() {
   }, [token]);
 
   useEffect(() => {
-    fetch("/users", {
+    fetch(`${API_BASE}/users`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -42,14 +42,15 @@ export default function AdminDashboard() {
       });
   }, [token]);
 
-  const assignUser = async (userId: string) => {
-    if (!userId.trim()) {
+  const assignUser = async (userId: string | number) => {
+    const idStr = String(userId).trim();
+    if (!idStr) {
       alert("Enter a user ID");
       return;
     }
 
     try {
-      const res = await fetch(`/users/${userId}/pharmacy`, {
+      const res = await fetch(`${API_BASE}/users/${idStr}/pharmacy`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -58,7 +59,7 @@ export default function AdminDashboard() {
 
       if (!res.ok) throw new Error();
 
-      setUsers((prev) => prev.filter((u) => u.id !== userId));
+      setUsers((prev) => prev.filter((u) => u.userID !== Number(idStr)));
 
       setManualId("");
       alert("User assigned successfully");
@@ -74,7 +75,7 @@ export default function AdminDashboard() {
         <h1 className="dashboard-title">Admin Dashboard</h1>
 
         <p className="dashboard-subtitle">
-          Pharmacy ID: {profile?.pharmacyId || "Loading..."}
+          Pharmacy ID: {profile?.pharmacyID || "Loading..."}
         </p>
 
         <div className="dashboard-section">
@@ -112,6 +113,7 @@ export default function AdminDashboard() {
             <table className="dashboard-table">
               <thead>
                 <tr>
+                  <th>User ID</th>
                   <th>Name</th>
                   <th>Email</th>
                   <th>Role</th>
@@ -121,14 +123,15 @@ export default function AdminDashboard() {
 
               <tbody>
                 {users.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.name}</td>
+                  <tr key={user.userID}>
+                    <td>{user.userID}</td>
+                    <td>{user.firstName} {user.lastName}</td>
                     <td>{user.email}</td>
                     <td>{user.role}</td>
                     <td>
                       <button
                         className="dashboard-button"
-                        onClick={() => assignUser(user.id)}
+                        onClick={() => assignUser(user.userID)}
                       >
                         Assign
                       </button>
