@@ -1,96 +1,136 @@
-# capstone-project-team-7-skyroute
+# SkyRoute Platform
 
-## Installing
+A real-time, event-driven drone delivery and pharmacy fleet orchestration platform built with TypeScript, Express, Socket.io, Prisma, and Docker Compose.
 
-To install the dependencies needed to run this app, run:
+SkyRoute coordinates autonomous drone deliveries across independent pharmacy branches. It features multi-tenant data isolation, dependency-injected services, real-time GPS telemetry via WebSockets, and a containerized drone simulation fleet that replicates autonomous flight paths.
 
+---
+
+## System Architecture
+
+The project is structured as an npm monorepo using a **Vertical Slice Architecture** to cleanly isolate features across the stack:
+
+* **`apps/server`**: Express and TypeScript REST API upgraded with Socket.io for bidirectional communication. Implements role-based access control (RBAC), multi-tenant pharmacy scoping, and dependency-injected Prisma services.
+* **`apps/client`**: React and Vite single-page application for pharmacists, technicians, and administrators. Provides live fleet tracking, order assignment, and pharmacy management.
+* **`apps/drone-sim`**: Standalone Node.js worker acting as a virtual IoT drone client. Consumes flight assignments over Socket.io, simulates waypoint-based GPS telemetry, and reports delivery status changes.
+* **`packages/shared`**: Shared TypeScript data models, DTOs, and status enums used across services.
+
+---
+
+## Tech Stack
+
+* **Runtime & Language:** Node.js (v20+), TypeScript
+* **Backend Framework:** Express.js, Socket.io
+* **Database & ORM:** PostgreSQL, Prisma ORM
+* **Frontend:** React, Vite
+* **Testing:** Jest (Backend), Cypress (End-to-End)
+* **DevOps & Tooling:** Docker, Docker Compose, npm Workspaces
+
+---
+
+## Core Features
+
+* **Multi-Tenant Branch Isolation:** Restricts data visibility so pharmacy personnel only view and manage orders and drones belonging to their assigned pharmacy branch.
+* **Real-Time Fleet Telemetry:** Streams live drone coordinates via Socket.io rooms, persisting locations to PostgreSQL and broadcasting updates to the client dashboard.
+* **Order Orchestration:** Enforces validation checks before assigning orders to idle drones, automatically updating delivery and drone lifecycles.
+* **Simulated Hardware Workers:** Dedicated simulation containers model autonomous hardware behavior by reporting telemetry at fixed intervals.
+* **Role-Based Security:** JWT authentication protecting API routes and socket handshakes with role verification (Admin, Pharmacist, Technician).
+
+---
+
+## Prerequisites
+
+* Docker & Docker Compose (v2.0+)
+* Node.js (v20+)
+* npm (v10+)
+
+---
+
+## Getting Started
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/<your-username>/skyroute-platform.git
+cd skyroute-platform
 ```
-sudo apt install docker-compose
-sudo apt install npm
+
+### 2. Configure Environment Variables
+Create an `.env` file in `apps/server/.env`:
+
+```env
+PORT=8080
+DATABASE_URL="postgresql://SkyRouteAdmin:SkyR0uteP@55w0rd@db:5432/SkyRoute"
+JWT_SECRET="super-secret-development-key"
+JWT_EXPIRES_IN="1h"
 ```
 
-## Developing
+*(Note: `docker-compose.yml` automatically passes database credentials to PostgreSQL for local development).*
 
-For the first run of the app, run this
-```
-sudo docker-compose up --build
-```
+### 3. Launch the Application
+Build and start all services using Docker Compose:
 
-After changes have been made, run these commands
-```
-sudo docker-compose down
-sudo docker-compose up --build
+```bash
+docker compose up --build
 ```
 
-If you want to add to the prisma schema rebuild the containter.
+This starts:
+* **Backend API & WebSockets:** `http://localhost:8080`
+* **Frontend Dashboard:** `http://localhost:5173`
+* **PostgreSQL Database:** `localhost:5432`
+* **Adminer (Database GUI):** `http://localhost:8081`
+* **Drone Simulators:** Connected via internal Docker networking
 
-
-## Tests
-
-### Backend Tests
-To test the server-side code, run this command:
+To shut down all containers:
+```bash
+docker compose down
 ```
+
+---
+
+## Database Management
+
+Database migrations run automatically on container startup. If you want to interact with Prisma directly from your host machine, install the Prisma CLI:
+
+```bash
+npm install -g prisma
+```
+
+Common database tasks:
+```bash
+# Generate Prisma Client after modifying schema.prisma
+npx prisma generate
+
+# Apply new migrations locally
+npx prisma migrate dev --name <migration-name>
+
+# Reset database to a clean state with seed data
+npx prisma migrate reset
+```
+
+---
+
+## Running Tests
+
+### Backend Unit & Integration Tests
+Run the backend test suite:
+
+```bash
 cd apps/server
 npx prisma generate
 npm test
 ```
-This will run the code using the testing environment.
 
 ### End-to-End Tests
-To start Cypress to run end-to-end tests
+Ensure your server is running (`docker compose up`), then launch Cypress from the client workspace:
 
-Start the server first (Refer to the 'Developing' section)
-
-In another terminal run these commands:
-```
-cd apps/client 
+```bash
+cd apps/client
 npm install
 npx cypress open
 ```
-Cypress has dependencies for running on Linux depending on your version if an error is encountered when trying to open Cypress refer to this
-https://docs.cypress.io/app/get-started/install-cypress#Linux-Prerequisites
 
-## Environment file
-Create a .env file in the ./apps/server directory
+---
 
-```
-DATABASE_URL="postgresql://SkyRouteAdmin:SkyR0uteP@55w0rd@db:5432/SkyRoute"
-JWT_SECRET="asdf"
-JWT_EXPIRES_IN="1h"
-```
+## License
 
-
-## Database
-
-Ensure that you have prisma installed globally by running
-
-```
-npm install -g prisma
-```
-
-The database files are migrated automatically.
-
-To reset the database:
-```
-npx prisma migrate reset
-```
-This command will reset the database and erase all previous data.
-
-## Video Demonstration
-Development Checkpoint 1 Demo Video:
-```
-https://www.loom.com/share/33586033103142e0b117cd95e669bae1
-```
-Development Checkpoint 2 Demo Video:
-```
-https://drive.google.com/file/d/1BTRljRbTGgiH9rrAVyBe-ALypK0dl1Em/view?usp=sharing
-```
-Technical Documentation Video: 
-```
-https://drive.google.com/file/d/1kSIEa2Upg3aH6rNtSOAM5hkwb90Dzw0m/view?usp=sharing
-```
-User Documentation Video:
-```
-https://drive.google.com/file/d/1nLAiQpSQxuMVn8SOaAPiZwviO4dFopMj/view?usp=sharing
-```
-
+This project is licensed under the MIT License - see the LICENSE file for details.
