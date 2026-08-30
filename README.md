@@ -55,16 +55,15 @@ cd skyroute-platform
 ```
 
 ### 2. Configure Environment Variables
-Create an `.env` file in `apps/server/.env`:
+Create an `.env` file at the root of the project by copying the provided example file:
 
-```env
-PORT=8080
-DATABASE_URL="postgresql://SkyRouteAdmin:SkyR0uteP@55w0rd@db:5432/SkyRoute"
-JWT_SECRET="super-secret-development-key"
-JWT_EXPIRES_IN="1h"
+```bash
+cp .env.example .env
 ```
 
-*(Note: `docker-compose.yml` automatically passes database credentials to PostgreSQL for local development).*
+The default values in `.env` are sufficient for local development. These variables configure database credentials, JWT secrets, and service account passwords across the platform.
+
+*(Note: `docker-compose.yml` automatically injects these variables into the required services like the server, database, and drone simulators).*
 
 ### 3. Launch the Application
 Build and start all services using Docker Compose:
